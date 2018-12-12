@@ -1,5 +1,6 @@
 package de.gcffm.gcffmapp;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -104,4 +105,12 @@ class GcEvent {
         return (Math.abs(degE6) * 60L % 60000000L) / 1000000d;
     }
 
+    public boolean isToday() {
+        final Calendar today = Calendar.getInstance();
+        final Calendar eventCal = Calendar.getInstance();
+        eventCal.setTime(datum);
+
+        return today.get(Calendar.DAY_OF_YEAR) == eventCal.get(Calendar.DAY_OF_YEAR)
+                && today.get(Calendar.YEAR) == eventCal.get(Calendar.YEAR);
+    }
 }

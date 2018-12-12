@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Geocacher FFM</string>
+    <string name="app_name">Geocaching FFM</string>
     <string name="connecting">Verbinde…</string>
     <string name="reading_data">Lese Daten</string>
     <string name="processing_data">Verarbeite Daten</string>
@@ -11,5 +11,8 @@
     <string name="menu_event_navigate">Navigieren</string>
     <string name="menu_event_copy_geocode">Geocode kopieren</string>
     <string name="menu_event_add_to_calendar">Zum Kalender hinzufügen</string>
-    <string name="event_geocode">Event Geocode</string>
+    <string name="geocode">Geocode</string>
+    <string name="coords">Koordinaten</string>
+    <string name="copied_to_clipboard">%s in die Zwischenablage kopiert</string>
+    <string name="menu_event_copy_coords">Koordinaten kopieren</string>
 </resources>

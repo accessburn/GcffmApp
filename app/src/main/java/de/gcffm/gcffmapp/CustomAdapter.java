@@ -1,6 +1,7 @@
 package de.gcffm.gcffmapp;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.text.Html;
@@ -65,6 +66,12 @@ public class CustomAdapter extends ArrayAdapter<GcEvent> {
                     name.setText(Html.fromHtml(p.getName() , Html.FROM_HTML_MODE_LEGACY));
                 } else {
                     name.setText(Html.fromHtml(p.getName()));
+                }
+
+                if (p.isToday()) {
+                    name.setTextColor(mContext.getResources().getColor(R.color.colorPrimary));
+                } else {
+                    name.setTextColor(Color.BLACK);
                 }
             }
 

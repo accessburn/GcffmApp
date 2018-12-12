@@ -44,8 +44,9 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int MENU_CONTEXT_OPEN_ID = 1;
     private static final int MENU_CONTEXT_NAVIGATE_ID = 2;
-    private static final int MENU_CONTEXT_GEOCODE_ID = 3;
+    private static final int MENU_CONTEXT_COPY_GEOCODE_ID = 3;
     private static final int MENU_CONTEXT_CALENDAR_ID = 4;
+    private static final int MENU_CONTEXT_COPY_COORDS_ID = 5;
     public final String TAG = "MainActivity";
     private ListView listView;
 
@@ -65,7 +66,8 @@ public class MainActivity extends AppCompatActivity {
         if (v.getId() == R.id.listView) {
             menu.add(Menu.NONE, MENU_CONTEXT_OPEN_ID, Menu.NONE, R.string.menu_event_open);
             menu.add(Menu.NONE, MENU_CONTEXT_NAVIGATE_ID, Menu.NONE, R.string.menu_event_navigate);
-            menu.add(Menu.NONE, MENU_CONTEXT_GEOCODE_ID, Menu.NONE, R.string.menu_event_copy_geocode);
+            menu.add(Menu.NONE, MENU_CONTEXT_COPY_GEOCODE_ID, Menu.NONE, R.string.menu_event_copy_geocode);
+            menu.add(Menu.NONE, MENU_CONTEXT_COPY_COORDS_ID, Menu.NONE, R.string.menu_event_copy_coords);
             menu.add(Menu.NONE, MENU_CONTEXT_CALENDAR_ID, Menu.NONE, R.string.menu_event_add_to_calendar);
         }
     }
@@ -84,10 +86,11 @@ public class MainActivity extends AppCompatActivity {
                 final String location = String.format("geo:0,0?q=%s(%s)", event.getDecimalCoords(), event.getName());
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(location)));
                 return true;
-            case MENU_CONTEXT_GEOCODE_ID:
-                final ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                final ClipData clip = ClipData.newPlainText(getResources().getString(R.string.event_geocode), event.getGeocode());
-                clipboard.setPrimaryClip(clip);
+            case MENU_CONTEXT_COPY_GEOCODE_ID:
+                copyToClipboard(R.string.geocode, event.getGeocode());
+                return true;
+            case MENU_CONTEXT_COPY_COORDS_ID:
+                copyToClipboard(R.string.coords, event.getCoords());
                 return true;
             case MENU_CONTEXT_CALENDAR_ID:
                 final Intent intent = new Intent(Intent.ACTION_INSERT)
@@ -104,6 +107,13 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onContextItemSelected(item);
         }
+    }
+
+    private void copyToClipboard(final int label, final String text) {
+        final ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        final ClipData clip = ClipData.newPlainText(getResources().getString(label), text);
+        clipboard.setPrimaryClip(clip);
+        Toast.makeText(this, getResources().getString(R.string.copied_to_clipboard, getResources().getString(label)), Toast.LENGTH_LONG).show();
     }
 
     public String stripHtml(final String html) {
@@ -152,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
 
                 final InputStream stream = connection.getInputStream();
                 reader = new BufferedReader(new InputStreamReader(stream));
-                final StringBuffer buffer = new StringBuffer();
+                final StringBuilder buffer = new StringBuilder();
                 String line = "";
                 while ((line = reader.readLine()) != null) {
                     buffer.append(line);
@@ -235,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onProgressUpdate(final String... values) {
             super.onProgressUpdate(values);
-            progressDialog.setMessage(getString(R.string.loading_data) + values[0]);
+            progressDialog.setMessage(values[0]);
 
         }
 
