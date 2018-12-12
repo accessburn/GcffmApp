@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Geocacher FFM</string>
+    <string name="connecting">Verbinde…</string>
+    <string name="reading_data">Lese Daten</string>
+    <string name="processing_data">Verarbeite Daten</string>
+    <string name="processing_item_of">Verarbeite %1$d/%2$d</string>
+    <string name="events_loaded">Events geladen</string>
+    <string name="event_update_failed">Fehler beim Laden der Events: </string>
+    <string name="loading_data">lade Events</string>
+    <string name="menu_event_open">Event öffnen</string>
+    <string name="menu_event_navigate">Navigieren</string>
+    <string name="menu_event_copy_geocode">Geocode kopieren</string>
+    <string name="menu_event_add_to_calendar">Zum Kalender hinzufügen</string>
+    <string name="event_geocode">Event Geocode</string>
+</resources>
