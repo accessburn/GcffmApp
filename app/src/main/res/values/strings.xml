@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Geocaching FFM</string>
+    <string name="app_name">Geocaching Frankfurt</string>
     <string name="connecting">Verbinde…</string>
     <string name="reading_data">Lese Daten</string>
     <string name="processing_data">Verarbeite Daten</string>
@@ -23,4 +23,8 @@
         "\n\n"Diese App wurde entwickelt für <b><a href="https://gcffm.de">gcffm.de</a></b>.
 </string>
     <string name="logo">Logo</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="nav_header_subtitle">gcffm.de</string>
 </resources>
