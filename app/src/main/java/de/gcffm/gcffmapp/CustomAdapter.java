@@ -1,7 +1,6 @@
 package de.gcffm.gcffmapp;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.text.Html;
@@ -40,12 +39,6 @@ public class CustomAdapter extends ArrayAdapter<GcEvent> {
             view = vi.inflate(resourceLayout, null);
         }
 
-        if (position % 2 == 1) {
-            view.setBackgroundResource(R.drawable.item_list_backgroundcolor);
-        } else {
-            view.setBackgroundResource(R.drawable.item_list_backgroundcolor2);
-        }
-
         final GcEvent p = getItem(position);
 
         if (p != null) {
@@ -68,13 +61,17 @@ public class CustomAdapter extends ArrayAdapter<GcEvent> {
                     name.setText(Html.fromHtml(p.getName()));
                 }
 
-                if (p.isToday()) {
-                    name.setTextColor(mContext.getResources().getColor(R.color.colorPrimary));
-                } else {
-                    name.setTextColor(Color.BLACK);
-                }
             }
 
+            if (p.isToday()) {
+                view.setBackgroundResource(R.drawable.item_list_backgroundcolor_today);
+            } else {
+                if (position % 2 == 1) {
+                    view.setBackgroundResource(R.drawable.item_list_backgroundcolor);
+                } else {
+                    view.setBackgroundResource(R.drawable.item_list_backgroundcolor2);
+                }
+            }
         }
 
         return view;

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#52b328</color>
+    <color name="colorPrimary">#54B12C</color>
     <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#0588b2</color>
+    <color name="colorAccent">#FFFF19</color>
 
     <color name="listItem1">#ffffff</color>
     <color name="listItem2">#F5F5F5</color>
-    <color name="listItemSelected">#c71c4d</color>
+    <color name="listItemSelected">#FF5B02</color>
 
 </resources>

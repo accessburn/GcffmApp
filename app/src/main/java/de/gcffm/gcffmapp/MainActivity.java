@@ -72,6 +72,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void launchAbout(final MenuItem menuItem) {
+        startActivity(new Intent(MainActivity.this, AboutActivity.class));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
     @Override
     public boolean onContextItemSelected(final MenuItem item) {
         final AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();

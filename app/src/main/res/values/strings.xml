@@ -15,4 +15,12 @@
     <string name="coords">Koordinaten</string>
     <string name="copied_to_clipboard">%s in die Zwischenablage kopiert</string>
     <string name="menu_event_copy_coords">Koordinaten kopieren</string>
+    <string name="about">Über</string>
+    <string name="menu_other">Other</string>
+    <string name="app_info_text">App-Entwicklung: <b><a href="https://github.com/pstorch">Peter Storch</a></b>
+        "\n"Source: <b><a href="https://github.com/pstorch/GcffmApp">GitHub</a></b>
+        "\n"Lizenz: <b><a href="https://github.com/pstorch/GcffmApp/blob/master/LICENSE.txt">MIT</a></b>
+        "\n\n"Diese App wurde entwickelt für <b><a href="https://gcffm.de">gcffm.de</a></b>.
+</string>
+    <string name="logo">Logo</string>
 </resources>
