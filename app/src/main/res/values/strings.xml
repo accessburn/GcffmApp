@@ -9,9 +9,9 @@
     <string name="loading_data">lade Events</string>
     <string name="menu_event_open">Event öffnen</string>
     <string name="menu_event_navigate">Navigieren</string>
-    <string name="menu_event_copy_geocode">Geocode kopieren</string>
+    <string name="menu_event_copy_geocode">GC-Code kopieren</string>
     <string name="menu_event_add_to_calendar">Zum Kalender hinzufügen</string>
-    <string name="geocode">Geocode</string>
+    <string name="geocode">GC-Code</string>
     <string name="coords">Koordinaten</string>
     <string name="copied_to_clipboard">%s in die Zwischenablage kopiert</string>
     <string name="menu_event_copy_coords">Koordinaten kopieren</string>
