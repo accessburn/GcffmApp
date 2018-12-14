@@ -120,6 +120,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if (id == R.id.menuItemAbout) {
             startActivity(new Intent(this, AboutActivity.class));
+        } else if (id == R.id.menuItemTwitter) {
+            final Uri uri = Uri.parse("https://twitter.com/gcffm");
+            startActivity(new Intent(Intent.ACTION_VIEW, uri));
+        } else if (id == R.id.menuItemFacebook) {
+            final Uri uri = Uri.parse("https://www.facebook.com/gcffm/");
+            startActivity(new Intent(Intent.ACTION_VIEW, uri));
         }
 
         final DrawerLayout drawer = findViewById(R.id.drawer_layout);

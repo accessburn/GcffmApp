@@ -27,4 +27,6 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="nav_header_subtitle">gcffm.de</string>
+    <string name="twitter">twitter.com/gcffm</string>
+    <string name="facebook">facebook.com/gcffm/</string>
 </resources>

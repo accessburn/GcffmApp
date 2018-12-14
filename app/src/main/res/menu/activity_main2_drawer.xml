@@ -8,4 +8,14 @@
         android:id="@+id/menuItemAbout"
         android:title="@string/about"/>
 
+    <item
+        android:icon="@drawable/ic_icons8_twitter"
+        android:id="@+id/menuItemTwitter"
+        android:title="@string/twitter"/>
+
+    <item
+        android:icon="@drawable/ic_icons8_facebook_24"
+        android:id="@+id/menuItemFacebook"
+        android:title="@string/facebook"/>
+
 </menu>
