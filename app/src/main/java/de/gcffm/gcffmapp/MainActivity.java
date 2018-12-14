@@ -1,6 +1,5 @@
 package de.gcffm.gcffmapp;
 
-import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
@@ -14,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -56,6 +56,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final int ONE_HOUR = 60 * 60 * 1000;
     public final String TAG = "MainActivity";
     private ListView listView;
+    private SwipeRefreshLayout swipeContainer;
+    private CustomAdapter adapter;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -76,6 +78,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         listView = findViewById(R.id.listView);
         registerForContextMenu(listView);
 
+        adapter = new CustomAdapter(getApplicationContext(), R.layout.item, new ArrayList<GcEvent>());
+        listView .setAdapter(adapter);
+
+        swipeContainer = findViewById(R.id.swipeContainer);
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshEvents();
+            }
+        });
+
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
+        refreshEvents();
+    }
+
+    private void refreshEvents() {
         new JSONTask().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
     }
 
@@ -169,8 +192,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public class JSONTask extends AsyncTask<Void, String, List<GcEvent>> {
-
-        private ProgressDialog progressDialog;
         private Exception exception;
 
         private void enableHttpResponseCache() {
@@ -195,14 +216,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             BufferedReader reader = null;
             int count = 0;
 
-            publishProgress(getResources().getString(R.string.connecting));
             final List<GcEvent> events = new ArrayList<>(count);
             try {
                 final URL url = new URL(API_START_URL);
                 connection = (HttpURLConnection) url.openConnection();
                 connection.connect();
-
-                publishProgress(getString(R.string.reading_data));
 
                 final InputStream stream = connection.getInputStream();
                 reader = new BufferedReader(new InputStreamReader(stream));
@@ -213,13 +231,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
                 final String finalJson = buffer.toString();
 
-                publishProgress(getString(R.string.processing_data));
                 final JSONArray eventList = new JSONObject(finalJson).getJSONArray("event");
                 count = eventList.length();
                 Log.i(TAG, "Parsed " + count + " events");
 
                 for (int i = 0; i < eventList.length(); i++) {
-                    publishProgress(getResources().getString(R.string.processing_item_of, i, count));
                     final JSONObject jsonObj = (JSONObject) eventList.get(i);
 
                     final GcEvent event = new GcEvent();
@@ -234,11 +250,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
 
                     event.setDatum(new Date(Long.parseLong(jsonObj.getString("datum")) * 1000));
-
                     events.add(event);
                 }
-
-                publishProgress(getString(R.string.events_loaded));
             } catch (final Exception e) {
                 Log.e(TAG, "Error refreshing events", e);
                 exception = e;
@@ -262,15 +275,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (MainActivity.this.isDestroyed()) {
                 return;
             }
-            if (progressDialog != null && progressDialog.isShowing()) {
-                progressDialog.dismiss();
-            }
 
+            swipeContainer.setRefreshing(false);
             if (exception != null) {
                 Toast.makeText(getBaseContext(), getString(R.string.event_update_failed) + exception.getMessage(), Toast.LENGTH_LONG).show();
             } else {
-                final CustomAdapter customAdapter = new CustomAdapter(getApplicationContext(), R.layout.item, gcEvents);
-                listView .setAdapter(customAdapter);
+                adapter.clear();
+                adapter.addAll(gcEvents);
             }
 
             unlockScreenOrientation();
@@ -279,18 +290,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         @Override
         protected void onPreExecute() {
             lockScreenOrientation();
-            progressDialog = new ProgressDialog(MainActivity.this);
-            progressDialog.setIndeterminate(false);
-
-            // show it
-            progressDialog.show();
-        }
-
-        @Override
-        protected void onProgressUpdate(final String... values) {
-            super.onProgressUpdate(values);
-            progressDialog.setMessage(values[0]);
-
+            swipeContainer.setRefreshing(true);
         }
 
         private void lockScreenOrientation() {
