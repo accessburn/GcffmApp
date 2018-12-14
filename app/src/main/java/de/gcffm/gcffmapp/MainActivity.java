@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final int MENU_CONTEXT_COPY_GEOCODE_ID = 3;
     private static final int MENU_CONTEXT_CALENDAR_ID = 4;
     private static final int MENU_CONTEXT_COPY_COORDS_ID = 5;
+    public static final int ONE_HOUR = 60 * 60 * 1000;
     public final String TAG = "MainActivity";
     private ListView listView;
 
@@ -140,9 +141,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .putExtra(CalendarContract.Events.TITLE, stripHtml(event.getName()))
                         .putExtra(CalendarContract.Events.HAS_ALARM, false)
                         .putExtra(CalendarContract.Events.DESCRIPTION, event.getCoordInfoUrl())
-                        .putExtra(CalendarContract.Events.EVENT_TIMEZONE, "UTC");
+                        .putExtra(CalendarContract.Events.EVENT_TIMEZONE, "GMT+1");
                 intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.getDatum().getTime());
-                intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true);
+                intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, event.getDatum().getTime() + ONE_HOUR);
+                intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, false);
                 intent.putExtra(CalendarContract.Events.EVENT_LOCATION, event.getCoords());
                 startActivity(intent);
                 return true;
