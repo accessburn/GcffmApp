@@ -18,9 +18,13 @@
     <string name="about">Über</string>
     <string name="menu_other">Other</string>
     <string name="app_info_text">App-Entwicklung: <b><a href="https://github.com/pstorch">Peter Storch</a></b>
-        "\n"Source: <b><a href="https://github.com/pstorch/GcffmApp">GitHub</a></b>
+        "\n\n\n"Source: <b><a href="https://github.com/pstorch/GcffmApp">GitHub</a></b>
         "\n"Lizenz: <b><a href="https://github.com/pstorch/GcffmApp/blob/master/LICENSE.txt">MIT</a></b>
         "\n\n"Diese App wurde entwickelt für <b><a href="https://gcffm.de">gcffm.de</a></b>.
+        "\n\n\n"Info:
+        "\n"- Gelb herforgehobene Events finden heute statt. 
+        "\n"- Eventliste wird drei Tage rückwirkend angezeigt.
+        "\n"- Event lange gedrückt halten öffnet Menü.
 </string>
     <string name="logo">Logo</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
