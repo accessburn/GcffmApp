@@ -1,4 +1,4 @@
-package de.gcffm.gcffmapp;
+package de.gcffm.app;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
