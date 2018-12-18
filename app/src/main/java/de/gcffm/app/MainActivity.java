@@ -45,7 +45,7 @@ import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private static final String API_START_URL = "https://gcffm.de/api.php?module=event&action=get";
+    private static final String API_START_URL = "https://gcffm.de/api.php?module=event&action=get&ver=2";
     private static final Pattern COORD_PATTERN = Pattern.compile("([\\d\\.]+)\\s+([\\d\\.]+)");
 
     private static final int MENU_CONTEXT_OPEN_ID = 1;
