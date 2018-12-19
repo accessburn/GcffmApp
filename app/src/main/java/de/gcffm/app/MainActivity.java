@@ -3,8 +3,6 @@ package de.gcffm.app;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -290,28 +288,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 adapter.clear();
                 adapter.addAll(gcEvents);
             }
-
-            unlockScreenOrientation();
         }
 
         @Override
         protected void onPreExecute() {
-            lockScreenOrientation();
             swipeContainer.setRefreshing(true);
         }
 
-        private void lockScreenOrientation() {
-            final int currentOrientation = getResources().getConfiguration().orientation;
-            if (currentOrientation == Configuration.ORIENTATION_PORTRAIT) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            } else {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            }
-        }
-
-        private void unlockScreenOrientation() {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
-        }
     }
 
 }
