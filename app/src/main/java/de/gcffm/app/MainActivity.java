@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         listView = findViewById(R.id.listView);
         registerForContextMenu(listView);
 
-        adapter = new CustomAdapter(getApplicationContext(), R.layout.item, new ArrayList<GcEvent>());
+        adapter = new CustomAdapter(this, R.layout.item, new ArrayList<GcEvent>());
         listView .setAdapter(adapter);
 
         swipeContainer = findViewById(R.id.swipeContainer);
