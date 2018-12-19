@@ -113,4 +113,14 @@ class GcEvent {
         return today.get(Calendar.DAY_OF_YEAR) == eventCal.get(Calendar.DAY_OF_YEAR)
                 && today.get(Calendar.YEAR) == eventCal.get(Calendar.YEAR);
     }
+
+    public boolean isPast() {
+        final Calendar today = Calendar.getInstance();
+        final Calendar eventCal = Calendar.getInstance();
+        eventCal.setTime(datum);
+
+        return today.get(Calendar.DAY_OF_YEAR) > eventCal.get(Calendar.DAY_OF_YEAR)
+                && today.get(Calendar.YEAR) >= eventCal.get(Calendar.YEAR);
+    }
+
 }

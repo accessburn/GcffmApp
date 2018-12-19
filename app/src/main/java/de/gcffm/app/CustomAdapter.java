@@ -45,13 +45,16 @@ public class CustomAdapter extends ArrayAdapter<GcEvent> {
             final TextView date = view.findViewById(R.id.eventDate);
             final TextView coord = view.findViewById(R.id.eventCoord);
             final TextView name = view.findViewById(R.id.eventName);
+            final float alpha = p.isPast() ? 0.5f : 1.0f;
 
             if (date != null) {
                 date.setText(SimpleDateFormat.getDateInstance(DateFormat.SHORT).format(p.getDatum()));
+                date.setAlpha(alpha);
             }
 
             if (coord != null) {
                 coord.setText(p.getCoords());
+                coord.setAlpha(alpha);
             }
 
             if (name != null) {
@@ -60,7 +63,7 @@ public class CustomAdapter extends ArrayAdapter<GcEvent> {
                 } else {
                     name.setText(Html.fromHtml(p.getName()));
                 }
-
+                name.setAlpha(alpha);
             }
 
             if (p.isToday()) {
