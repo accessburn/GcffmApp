@@ -10,6 +10,8 @@ class GcEvent {
     private Date datum;
     private double lat;
     private double lon;
+    private String owner;
+    private EventType type = EventType.EVENT;
 
     public Date getDatum() {
         return datum;
@@ -123,4 +125,23 @@ class GcEvent {
                 && today.get(Calendar.YEAR) >= eventCal.get(Calendar.YEAR);
     }
 
+    public void setOwner(final String owner) {
+        this.owner = owner;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setType(final EventType type) {
+        this.type = type;
+    }
+
+    public EventType getType() {
+        return type;
+    }
+
+    public String getCalendarDescription() {
+        return String.format("%s\n%s\nein Service von https://gcffm.de", getCoordInfoUrl(), owner);
+    }
 }

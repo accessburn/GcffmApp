@@ -45,26 +45,21 @@ public class CustomAdapter extends ArrayAdapter<GcEvent> {
             final TextView date = view.findViewById(R.id.eventDate);
             final TextView coord = view.findViewById(R.id.eventCoord);
             final TextView name = view.findViewById(R.id.eventName);
+            final TextView type = view.findViewById(R.id.eventType);
+            final TextView owner = view.findViewById(R.id.eventOwner);
             final float alpha = p.isPast() ? 0.5f : 1.0f;
 
-            if (date != null) {
-                date.setText(SimpleDateFormat.getDateInstance(DateFormat.SHORT).format(p.getDatum()));
-                date.setAlpha(alpha);
-            }
+            date.setText(SimpleDateFormat.getDateInstance(DateFormat.SHORT).format(p.getDatum()));
+            date.setAlpha(alpha);
+            coord.setText(p.getCoords());
+            coord.setAlpha(alpha);
 
-            if (coord != null) {
-                coord.setText(p.getCoords());
-                coord.setAlpha(alpha);
+            if (Build.VERSION.SDK_INT >= 24) {
+                name.setText(Html.fromHtml(p.getName() , Html.FROM_HTML_MODE_LEGACY));
+            } else {
+                name.setText(Html.fromHtml(p.getName()));
             }
-
-            if (name != null) {
-                if (Build.VERSION.SDK_INT >= 24) {
-                    name.setText(Html.fromHtml(p.getName() , Html.FROM_HTML_MODE_LEGACY));
-                } else {
-                    name.setText(Html.fromHtml(p.getName()));
-                }
-                name.setAlpha(alpha);
-            }
+            name.setAlpha(alpha);
 
             if (p.isToday()) {
                 view.setBackgroundResource(R.drawable.item_list_backgroundcolor_today);
@@ -75,6 +70,11 @@ public class CustomAdapter extends ArrayAdapter<GcEvent> {
                     view.setBackgroundResource(R.drawable.item_list_backgroundcolor2);
                 }
             }
+
+            type.setText(p.getType().getDescription());
+            type.setAlpha(alpha);
+            owner.setText(p.getOwner());
+            owner.setAlpha(alpha);
         }
 
         return view;

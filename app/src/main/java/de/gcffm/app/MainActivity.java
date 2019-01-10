@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .setData(Uri.parse("content://com.android.calendar/events"))
                         .putExtra(CalendarContract.Events.TITLE, stripHtml(event.getName()))
                         .putExtra(CalendarContract.Events.HAS_ALARM, false)
-                        .putExtra(CalendarContract.Events.DESCRIPTION, event.getCoordInfoUrl())
+                        .putExtra(CalendarContract.Events.DESCRIPTION, event.getCalendarDescription())
                         .putExtra(CalendarContract.Events.EVENT_TIMEZONE, "GMT+1");
                 intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.getDatum().getTime());
                 intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, event.getDatum().getTime() + ONE_HOUR);
@@ -246,6 +246,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     final GcEvent event = new GcEvent();
                     event.setName(jsonObj.getString("name"));
                     event.setGeocode(jsonObj.getString("geocode"));
+                    event.setOwner(jsonObj.getString("owner"));
+                    event.setType(EventType.byName(jsonObj.getString("type")));
 
                     final String coord = jsonObj.getString("coord");
                     final Matcher matcher = COORD_PATTERN.matcher(coord);
