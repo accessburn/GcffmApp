@@ -13,6 +13,7 @@ import android.widget.TextView;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Adapter for ListView of GcEvents
@@ -49,7 +50,9 @@ public class CustomAdapter extends ArrayAdapter<GcEvent> {
             final TextView owner = view.findViewById(R.id.eventOwner);
             final float alpha = p.isPast() ? 0.5f : 1.0f;
 
-            date.setText(SimpleDateFormat.getDateInstance(DateFormat.SHORT).format(p.getDatum()));
+            final DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+            dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            date.setText(dateFormat.format(p.getDatum()));
             date.setAlpha(alpha);
             coord.setText(p.getCoords());
             coord.setAlpha(alpha);

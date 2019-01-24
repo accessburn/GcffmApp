@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .putExtra(CalendarContract.Events.TITLE, stripHtml(event.getName()))
                         .putExtra(CalendarContract.Events.HAS_ALARM, false)
                         .putExtra(CalendarContract.Events.DESCRIPTION, event.getCalendarDescription())
-                        .putExtra(CalendarContract.Events.EVENT_TIMEZONE, "GMT+1");
+                        .putExtra(CalendarContract.Events.EVENT_TIMEZONE, "UTC");
                 intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.getDatum().getTime());
                 intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, event.getDatum().getTime() + ONE_HOUR);
                 intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, false);
