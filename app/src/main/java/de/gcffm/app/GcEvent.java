@@ -1,23 +1,28 @@
 package de.gcffm.app;
 
+import android.support.annotation.NonNull;
+
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 class GcEvent {
+    public static final TimeZone GCFFM_TIMEZONE = TimeZone.getTimeZone("GMT+1");
+
     private String name;
     private String geocode;
-    private Date datum;
+    private long datum;
+    private long endDatum;
     private double lat;
     private double lon;
     private String owner;
     private EventType type = EventType.EVENT;
 
-    public Date getDatum() {
+    public long getDatum() {
         return datum;
     }
 
-    public void setDatum(final Date datum) {
+    public void setDatum(final long datum) {
         this.datum = datum;
     }
 
@@ -109,8 +114,7 @@ class GcEvent {
 
     public boolean isToday() {
         final Calendar today = Calendar.getInstance();
-        final Calendar eventCal = Calendar.getInstance();
-        eventCal.setTime(datum);
+        final Calendar eventCal = getDatumAsCalendar();
 
         return today.get(Calendar.DAY_OF_YEAR) == eventCal.get(Calendar.DAY_OF_YEAR)
                 && today.get(Calendar.YEAR) == eventCal.get(Calendar.YEAR);
@@ -118,11 +122,18 @@ class GcEvent {
 
     public boolean isPast() {
         final Calendar today = Calendar.getInstance();
-        final Calendar eventCal = Calendar.getInstance();
-        eventCal.setTime(datum);
+        final Calendar eventCal = getDatumAsCalendar();
 
         return today.get(Calendar.DAY_OF_YEAR) > eventCal.get(Calendar.DAY_OF_YEAR)
                 && today.get(Calendar.YEAR) >= eventCal.get(Calendar.YEAR);
+    }
+
+    @NonNull
+    public Calendar getDatumAsCalendar() {
+        final Calendar eventCal = Calendar.getInstance();
+        eventCal.setTimeInMillis(datum);
+        eventCal.setTimeZone(GCFFM_TIMEZONE);
+        return eventCal;
     }
 
     public void setOwner(final String owner) {
@@ -143,5 +154,13 @@ class GcEvent {
 
     public String getCalendarDescription() {
         return String.format("%s\n%s\nein Service von https://gcffm.de", getCoordInfoUrl(), owner);
+    }
+
+    public long getEndDatum() {
+        return endDatum;
+    }
+
+    public void setEndDatum(final long endDatum) {
+        this.endDatum = endDatum;
     }
 }

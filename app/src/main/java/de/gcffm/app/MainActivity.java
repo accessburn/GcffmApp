@@ -33,7 +33,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -168,9 +167,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .putExtra(CalendarContract.Events.TITLE, stripHtml(event.getName()))
                         .putExtra(CalendarContract.Events.HAS_ALARM, false)
                         .putExtra(CalendarContract.Events.DESCRIPTION, event.getCalendarDescription())
-                        .putExtra(CalendarContract.Events.EVENT_TIMEZONE, "UTC");
-                intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.getDatum().getTime());
-                intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, event.getDatum().getTime() + ONE_HOUR);
+                        .putExtra(CalendarContract.Events.EVENT_TIMEZONE, GcEvent.GCFFM_TIMEZONE);
+                intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.getDatum());
+                intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, event.getEndDatum());
                 intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, false);
                 intent.putExtra(CalendarContract.Events.EVENT_LOCATION, event.getCoords());
                 startActivity(intent);
@@ -256,7 +255,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         event.setLon(Double.parseDouble(matcher.group(2)));
                     }
 
-                    event.setDatum(new Date(Long.parseLong(jsonObj.getString("datum")) * 1000));
+                    event.setDatum(Long.parseLong(jsonObj.getString("datum")) * 1000);
+                    final long enddatum = Long.parseLong(jsonObj.getString("enddatum"));
+                    event.setEndDatum(enddatum > 0 ? enddatum * 1000 : event.getDatum() + ONE_HOUR);
                     events.add(event);
                 }
             } catch (final Exception e) {
