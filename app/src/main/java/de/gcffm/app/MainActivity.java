@@ -40,6 +40,9 @@ import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String API_START_URL = "https://gcffm.de/api.php?module=event&action=get&ver=2";
@@ -50,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final int MENU_CONTEXT_COPY_GEOCODE_ID = 3;
     private static final int MENU_CONTEXT_CALENDAR_ID = 4;
     private static final int MENU_CONTEXT_COPY_COORDS_ID = 5;
+    private static final int MENU_CONTEXT_SHARE_ID = 6;
+    private static final int MENU_CONTEXT_SUCHE_ID = 7;
     public static final int ONE_HOUR = 60 * 60 * 1000;
     public final String TAG = "MainActivity";
     private ListView listView;
@@ -120,6 +125,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.menuItemTwitter) {
             final Uri uri = Uri.parse("https://twitter.com/gcffm");
             startActivity(new Intent(Intent.ACTION_VIEW, uri));
+        } else if (id == R.id.menuItemTelegram) {
+            final Uri uri = Uri.parse("https://t.me/joinchat/Q8l3UN0g5tFhYjZi");
+            startActivity(new Intent(Intent.ACTION_VIEW, uri));
+        } else if (id == R.id.nav_email) {
+            final Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:info@gcffm.de"));
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.fab_subject));
+            startActivity(Intent.createChooser(emailIntent, getString(R.string.fab_chooser_title)));
         } else if (id == R.id.menuItemFacebook) {
             final Uri uri = Uri.parse("https://www.facebook.com/gcffm/");
             startActivity(new Intent(Intent.ACTION_VIEW, uri));
@@ -132,12 +144,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onCreateContextMenu(final ContextMenu menu, final View v, final ContextMenu.ContextMenuInfo menuInfo) {
+        final AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
+        final GcEvent event = (GcEvent) listView.getItemAtPosition(acmi.position);
+
         if (v.getId() == R.id.listView) {
             menu.add(Menu.NONE, MENU_CONTEXT_OPEN_ID, Menu.NONE, R.string.menu_event_open);
-            menu.add(Menu.NONE, MENU_CONTEXT_NAVIGATE_ID, Menu.NONE, R.string.menu_event_navigate);
+            if (!event.isPast()){
+                menu.add(Menu.NONE, MENU_CONTEXT_NAVIGATE_ID, Menu.NONE, R.string.menu_event_navigate);
+            }
             menu.add(Menu.NONE, MENU_CONTEXT_COPY_GEOCODE_ID, Menu.NONE, R.string.menu_event_copy_geocode);
             menu.add(Menu.NONE, MENU_CONTEXT_COPY_COORDS_ID, Menu.NONE, R.string.menu_event_copy_coords);
-            menu.add(Menu.NONE, MENU_CONTEXT_CALENDAR_ID, Menu.NONE, R.string.menu_event_add_to_calendar);
+            if (!event.isPast()) {
+                menu.add(Menu.NONE, MENU_CONTEXT_CALENDAR_ID, Menu.NONE, R.string.menu_event_add_to_calendar);
+                menu.add(Menu.NONE, MENU_CONTEXT_SHARE_ID, Menu.NONE, R.string.menu_event_share);
+            }
         }
     }
 
@@ -174,9 +194,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 intent.putExtra(CalendarContract.Events.EVENT_LOCATION, event.getCoords());
                 startActivity(intent);
                 return true;
+            case MENU_CONTEXT_SHARE_ID:
+                final Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Geocaching Event");
+                String shareMessage= "\nHallo, kommst du zu diesem Event?\n\n";
+                final DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+
+                shareMessage = shareMessage + "https://coord.info/" + event.getGeocode()
+                        + "\n\nStart:\n" + dateFormat.format(event.getDatum()) + " Uhr"
+                        + "\n\nKoordinaten:\nhttps://www.google.de/maps/search/" + event.getDecimalCoords() + "/"
+                        + "\n\nOwner:\n" + event.getOwner()
+                        + "\n\nEin Service von https://gcffm.de";
+                shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
+                startActivity(Intent.createChooser(shareIntent, "choose one"));
+
+
+                return true;
             default:
                 return super.onContextItemSelected(item);
         }
+    }
+
+    private void ShareTheEvent(final int label, final String text) {
+        final ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        final ClipData clip = ClipData.newPlainText(getResources().getString(label), text);
+        clipboard.setPrimaryClip(clip);
+        Toast.makeText(this, getResources().getString(R.string.copied_to_clipboard, getResources().getString(label)), Toast.LENGTH_LONG).show();
     }
 
     private void copyToClipboard(final int label, final String text) {

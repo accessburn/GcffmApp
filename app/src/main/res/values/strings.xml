@@ -17,7 +17,8 @@
     <string name="menu_event_copy_coords">Koordinaten kopieren</string>
     <string name="about">Über</string>
     <string name="menu_other">Other</string>
-    <string name="app_info_text">App-Entwicklung: <b><a href="https://github.com/pstorch">Peter Storch</a></b>
+    <string name="app_info_text">\n\nApp-Entwicklung: <b><a href="https://github.com/pstorch">Peter Storch</a></b>
+        \n<b>Kann Spuren von Tobias Riefer enthalten.</b>
         "\n\n\n"Source: <b><a href="https://github.com/pstorch/GcffmApp">GitHub</a></b>
         "\n"Lizenz: <b><a href="https://github.com/pstorch/GcffmApp/blob/master/LICENSE.txt">MIT</a></b>
         "\n\n"Diese App wurde entwickelt für <b><a href="https://gcffm.de">gcffm.de</a></b>.
@@ -25,12 +26,17 @@
         "\n"- Gelb hervorgehobene Events finden heute statt.
         "\n"- Eventliste wird drei Tage rückwirkend angezeigt.
         "\n"- Event lange gedrückt halten öffnet Menü.
-</string>
+    </string>
     <string name="logo">Logo</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_desc">Navigation header</string>
-    <string name="nav_header_subtitle">gcffm.de</string>
-    <string name="twitter">twitter.com/gcffm</string>
-    <string name="facebook">facebook.com/gcffm/</string>
+    <string name="nav_header_subtitle">Webseite</string>
+    <string name="twitter">Twitter</string>
+    <string name="facebook">facebook</string>
+    <string name="menu_event_share">Event teilen</string>
+    <string name="telegram">Telegram-Gruppe</string>
+    <string name="suche">Suche</string>
+    <string name="fab_subject">Nachricht zur gcffm-App</string>
+    <string name="fab_chooser_title">Mail versenden</string>
 </resources>

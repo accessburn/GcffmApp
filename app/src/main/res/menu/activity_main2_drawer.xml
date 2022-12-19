@@ -3,19 +3,28 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:showIn="navigation_view">
 
+    <group android:id="@+id/grp1" android:checkableBehavior="single">
+        <item
+            android:icon="@drawable/ic_icons8_twitter"
+            android:id="@+id/menuItemTwitter"
+            android:title="@string/twitter"/>
+        <item
+            android:icon="@drawable/ic_icons8_facebook_24"
+            android:id="@+id/menuItemFacebook"
+            android:title="@string/facebook"/>
+        <item
+            android:id="@+id/menuItemTelegram"
+            android:icon="@drawable/ic_icons8_telegram_24"
+            android:title="@string/telegram" />
+    </group>
+    <group android:id="@+id/grp2" android:checkableBehavior="single">
     <item
-        android:icon="@drawable/ic_info_outline_black_24dp"
-        android:id="@+id/menuItemAbout"
-        android:title="@string/about"/>
-
-    <item
-        android:icon="@drawable/ic_icons8_twitter"
-        android:id="@+id/menuItemTwitter"
-        android:title="@string/twitter"/>
-
-    <item
-        android:icon="@drawable/ic_icons8_facebook_24"
-        android:id="@+id/menuItemFacebook"
-        android:title="@string/facebook"/>
-
+            android:icon="@drawable/ic_info_outline_black_24dp"
+            android:id="@+id/menuItemAbout"
+            android:title="@string/about"/>
+        <item
+            android:id="@+id/nav_email"
+            android:icon="@drawable/ic_icons8_email_24"
+            android:title="Schreib uns" />
+    </group>
 </menu>
