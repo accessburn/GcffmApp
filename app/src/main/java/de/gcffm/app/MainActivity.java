@@ -8,16 +8,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
-import androidx.annotation.NonNull;
-import com.google.android.material.navigation.NavigationView;
-
-import androidx.appcompat.widget.SearchView;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
@@ -29,6 +19,20 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.google.android.material.navigation.NavigationView;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -37,17 +41,13 @@ import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         registerForContextMenu(listView);
 
         adapter = new CustomAdapter(this, R.layout.item, new ArrayList<>());
-        listView .setAdapter(adapter);
+        listView.setAdapter(adapter);
 
         swipeContainer = findViewById(R.id.swipeContainer);
         swipeContainer.setOnRefreshListener(this::refreshEvents);
@@ -147,11 +147,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onCreateContextMenu(final ContextMenu menu, final View v, final ContextMenu.ContextMenuInfo menuInfo) {
         final AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        final GcEvent event = (GcEvent) listView.getItemAtPosition(acmi.position);
+        final GcEvent event = (GcEvent) adapter.getItem(acmi.position);
 
         if (v.getId() == R.id.listView) {
             menu.add(Menu.NONE, MENU_CONTEXT_OPEN_ID, Menu.NONE, R.string.menu_event_open);
-            if (!event.isPast()){
+            if (!event.isPast()) {
                 menu.add(Menu.NONE, MENU_CONTEXT_NAVIGATE_ID, Menu.NONE, R.string.menu_event_navigate);
             }
             menu.add(Menu.NONE, MENU_CONTEXT_COPY_GEOCODE_ID, Menu.NONE, R.string.menu_event_copy_geocode);
@@ -212,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onContextItemSelected(final MenuItem item) {
         final AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        final GcEvent event = (GcEvent) listView.getItemAtPosition(acmi.position);
+        final GcEvent event = (GcEvent) adapter.getItem(acmi.position);
 
         switch (item.getItemId()) {
             case MENU_CONTEXT_OPEN_ID:
@@ -246,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 final Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 shareIntent.setType("text/plain");
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Geocaching Event");
-                String shareMessage= "\nHallo, kommst du zu diesem Event?\n\n";
+                String shareMessage = "\nHallo, kommst du zu diesem Event?\n\n";
                 final DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 
                 shareMessage = shareMessage + "https://coord.info/" + event.getGeocode()

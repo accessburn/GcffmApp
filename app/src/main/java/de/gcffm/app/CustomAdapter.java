@@ -2,17 +2,16 @@ package de.gcffm.app;
 
 import android.content.Context;
 import android.os.Build;
-import androidx.annotation.NonNull;
 import android.text.Html;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -47,8 +46,8 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
     }
 
     @Override
-    public Object getItem(final int position) {
-        return position;
+    public GcEvent getItem(final int position) {
+        return events.get(position);
     }
 
     @Override
@@ -83,7 +82,7 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
             coord.setAlpha(alpha);
 
             if (Build.VERSION.SDK_INT >= 24) {
-                name.setText(Html.fromHtml(p.getName() , Html.FROM_HTML_MODE_LEGACY));
+                name.setText(Html.fromHtml(p.getName(), Html.FROM_HTML_MODE_LEGACY));
             } else {
                 name.setText(Html.fromHtml(p.getName()));
             }
@@ -142,7 +141,7 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
 
                 for (final GcEvent event : allEvents) {
                     if (event.getName().toLowerCase(Locale.ROOT).contains(searchString)
-                        || event.getOwner().toLowerCase(Locale.ROOT).contains(searchString)) {
+                            || event.getOwner().toLowerCase(Locale.ROOT).contains(searchString)) {
                         newValues.add(event);
                     }
                 }
