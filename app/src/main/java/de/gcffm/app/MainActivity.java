@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final int MENU_CONTEXT_SHARE_ID = 6;
     private static final int MENU_CONTEXT_SUCHE_ID = 7;
     public static final int ONE_HOUR = 60 * 60 * 1000;
-    public final String TAG = "MainActivity";
+    public static final String TAG = "MainActivity";
     private ListView listView;
     private SwipeRefreshLayout swipeContainer;
     private CustomAdapter adapter;
@@ -97,7 +98,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void refreshEvents() {
-        new JSONTask().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+        swipeContainer.setRefreshing(true);
+        new Thread(new EventLoader(this)).start();
     }
 
     @Override
@@ -233,13 +235,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    public class JSONTask extends AsyncTask<Void, String, List<GcEvent>> {
-        private Exception exception;
+    public static class EventLoader implements Runnable {
 
-        private void enableHttpResponseCache() {
+        private final WeakReference<MainActivity> mainActivityRef;
+
+        protected EventLoader(final MainActivity mainActivity) {
+            mainActivityRef = new WeakReference<>(mainActivity);
+            enableHttpResponseCache(mainActivity);
+        }
+
+        private void enableHttpResponseCache(final MainActivity mainActivity) {
             try {
                 final long httpCacheSize = 10 * 1024 * 1024; // 10 MiB
-                final File httpCacheDir = new File(getCacheDir(), "http");
+                final File httpCacheDir = new File(mainActivity.getCacheDir(), "http");
                 Class.forName("android.net.http.HttpResponseCache")
                         .getMethod("install", File.class, long.class)
                         .invoke(null, httpCacheDir, httpCacheSize);
@@ -248,17 +256,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
 
-        protected JSONTask() {
-            enableHttpResponseCache();
-        }
-
         @Override
-        protected List<GcEvent> doInBackground(final Void... params) {
+        public void run() {
             HttpURLConnection connection = null;
             BufferedReader reader = null;
             int count = 0;
-
             final List<GcEvent> events = new ArrayList<>(count);
+
             try {
                 final URL url = new URL(API_START_URL);
                 connection = (HttpURLConnection) url.openConnection();
@@ -299,9 +303,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     event.setEndDatum(enddatum > 0 ? enddatum * 1000 : event.getDatum() + ONE_HOUR);
                     events.add(event);
                 }
+                onFinished(events, null);
             } catch (final Exception e) {
                 Log.e(TAG, "Error refreshing events", e);
-                exception = e;
+                onFinished(events, e);
             } finally {
                 if (connection != null) {
                     connection.disconnect();
@@ -314,29 +319,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     Log.e(TAG, "Cannot close reader", e);
                 }
             }
-            return events;
         }
 
-        @Override
-        protected void onPostExecute(final List<GcEvent> gcEvents) {
-            if (MainActivity.this.isDestroyed()) {
-                return;
-            }
-
-            swipeContainer.setRefreshing(false);
-            if (exception != null) {
-                Toast.makeText(getBaseContext(), getString(R.string.event_update_failed) + exception.getMessage(), Toast.LENGTH_LONG).show();
-            } else {
-                adapter.clear();
-                adapter.addAll(gcEvents);
+        private void onFinished(final List<GcEvent> events, final Exception exception) {
+            final MainActivity mainActivity = mainActivityRef.get();
+            if (mainActivity != null) {
+                mainActivity.runOnUiThread(() -> mainActivity.onNewEventsLoaded(events, exception));
             }
         }
 
-        @Override
-        protected void onPreExecute() {
-            swipeContainer.setRefreshing(true);
+    }
+
+    private void onNewEventsLoaded(final List<GcEvent> events, final Exception exception) {
+        if (isDestroyed()) {
+            return;
         }
 
+        swipeContainer.setRefreshing(false);
+        if (exception != null) {
+            Toast.makeText(getBaseContext(), getString(R.string.event_update_failed) + exception.getMessage(), Toast.LENGTH_LONG).show();
+        } else {
+            adapter.clear();
+            adapter.addAll(events);
+        }
     }
 
 }
