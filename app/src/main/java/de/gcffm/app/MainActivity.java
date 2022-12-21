@@ -7,14 +7,14 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.CalendarContract;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import com.google.android.material.navigation.NavigationView;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -34,6 +34,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,7 +47,7 @@ import java.text.SimpleDateFormat;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String API_START_URL = "https://gcffm.de/api.php?module=event&action=get&ver=2";
-    private static final Pattern COORD_PATTERN = Pattern.compile("([\\d\\.]+)\\s+([\\d\\.]+)");
+    private static final Pattern COORD_PATTERN = Pattern.compile("([\\d.]+)\\s+([\\d.]+)");
 
     private static final int MENU_CONTEXT_OPEN_ID = 1;
     private static final int MENU_CONTEXT_NAVIGATE_ID = 2;
@@ -80,16 +81,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         listView = findViewById(R.id.listView);
         registerForContextMenu(listView);
 
-        adapter = new CustomAdapter(this, R.layout.item, new ArrayList<GcEvent>());
+        adapter = new CustomAdapter(this, R.layout.item, new ArrayList<>());
         listView .setAdapter(adapter);
 
         swipeContainer = findViewById(R.id.swipeContainer);
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                refreshEvents();
-            }
-        });
+        swipeContainer.setOnRefreshListener(this::refreshEvents);
 
         // Configure the refreshing colors
         swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
@@ -114,7 +110,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull final MenuItem item) {
         // Handle navigation view item clicks here.
@@ -273,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 //final InputStream stream = getResources().openRawResource(R.raw.gcffm); // for local testing
                 reader = new BufferedReader(new InputStreamReader(stream));
                 final StringBuilder buffer = new StringBuilder();
-                String line = "";
+                String line;
                 while ((line = reader.readLine()) != null) {
                     buffer.append(line);
                 }
@@ -295,8 +290,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     final String coord = jsonObj.getString("coord");
                     final Matcher matcher = COORD_PATTERN.matcher(coord);
                     if (matcher.find()) {
-                        event.setLat(Double.parseDouble(matcher.group(1)));
-                        event.setLon(Double.parseDouble(matcher.group(2)));
+                        event.setLat(Double.parseDouble(Objects.requireNonNull(matcher.group(1))));
+                        event.setLon(Double.parseDouble(Objects.requireNonNull(matcher.group(2))));
                     }
 
                     event.setDatum(Long.parseLong(jsonObj.getString("datum")) * 1000);

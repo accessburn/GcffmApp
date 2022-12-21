@@ -2,7 +2,7 @@ package de.gcffm.app;
 
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,13 +20,11 @@ import java.util.List;
 public class CustomAdapter extends ArrayAdapter<GcEvent> {
 
     private final int resourceLayout;
-    private final Context mContext;
 
     public CustomAdapter(final Context context, final int resource, final List<GcEvent> events) {
         super(context, R.layout.item, events);
 
         this.resourceLayout = resource;
-        this.mContext = context;
     }
 
     @NonNull
