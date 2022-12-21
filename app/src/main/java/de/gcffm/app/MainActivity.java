@@ -1,14 +1,17 @@
 package de.gcffm.app;
 
+import android.app.SearchManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import androidx.annotation.NonNull;
 import com.google.android.material.navigation.NavigationView;
+
+import androidx.appcompat.widget.SearchView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -16,6 +19,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import android.text.Html;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -62,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ListView listView;
     private SwipeRefreshLayout swipeContainer;
     private CustomAdapter adapter;
+    private String lastSearch;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -156,6 +161,52 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 menu.add(Menu.NONE, MENU_CONTEXT_SHARE_ID, Menu.NONE, R.string.menu_event_share);
             }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(@NonNull final Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        final MenuItem searchMenu = menu.findItem(R.id.action_search);
+        searchMenu.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(final MenuItem arg0) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(final MenuItem arg0) {
+                invalidateOptionsMenu();
+                return true;
+            }
+        });
+
+        final SearchView searchView = (SearchView) searchMenu.getActionView();
+        searchView.setSearchableInfo(((SearchManager) getSystemService(Context.SEARCH_SERVICE)).getSearchableInfo(getComponentName()));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextSubmit(final String s) {
+                Log.d(TAG, "onQueryTextSubmit: " + s);
+                searchList(s);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(final String s) {
+                Log.d(TAG, "onQueryTextChange: " + s);
+                searchList(s);
+                return false;
+            }
+
+        });
+
+        return true;
+    }
+
+    private void searchList(final String search) {
+        this.lastSearch = search;
+        adapter.getFilter().filter(search);
     }
 
     @Override
@@ -339,8 +390,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (exception != null) {
             Toast.makeText(getBaseContext(), getString(R.string.event_update_failed) + exception.getMessage(), Toast.LENGTH_LONG).show();
         } else {
-            adapter.clear();
-            adapter.addAll(events);
+            adapter.replace(events);
+            if (!TextUtils.isEmpty(lastSearch)) {
+                searchList(lastSearch);
+            }
         }
     }
 

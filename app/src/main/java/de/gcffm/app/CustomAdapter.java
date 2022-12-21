@@ -4,27 +4,56 @@ import android.content.Context;
 import android.os.Build;
 import androidx.annotation.NonNull;
 import android.text.Html;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Adapter for ListView of GcEvents
  */
-public class CustomAdapter extends ArrayAdapter<GcEvent> {
+public class CustomAdapter extends BaseAdapter implements Filterable {
 
     private final int resourceLayout;
+    private final Object lock = new Object();
+    private ArrayFilter filter;
+    private List<GcEvent> allEvents;
+    private List<GcEvent> events;
+    private final Context context;
 
     public CustomAdapter(final Context context, final int resource, final List<GcEvent> events) {
-        super(context, R.layout.item, events);
+        super();
 
+        this.context = context;
+        this.allEvents = new ArrayList<>(events);
+        this.events = events;
         this.resourceLayout = resource;
+    }
+
+    @Override
+    public int getCount() {
+        return events != null ? events.size() : 0;
+    }
+
+    @Override
+    public Object getItem(final int position) {
+        return position;
+    }
+
+    @Override
+    public long getItemId(final int position) {
+        return position;
     }
 
     @NonNull
@@ -33,11 +62,11 @@ public class CustomAdapter extends ArrayAdapter<GcEvent> {
         View view = convertView;
         if (view == null) {
             final LayoutInflater vi;
-            vi = LayoutInflater.from(getContext());
+            vi = LayoutInflater.from(context);
             view = vi.inflate(resourceLayout, null);
         }
 
-        final GcEvent p = getItem(position);
+        final GcEvent p = events.get(position);
 
         if (p != null) {
             final TextView date = view.findViewById(R.id.eventDate);
@@ -77,6 +106,64 @@ public class CustomAdapter extends ArrayAdapter<GcEvent> {
         }
 
         return view;
+    }
+
+    @Override
+    public Filter getFilter() {
+        if (filter == null) {
+            filter = new ArrayFilter();
+        }
+        return filter;
+    }
+
+    public void replace(final List<GcEvent> events) {
+        this.events = events;
+        this.allEvents = new ArrayList<>(events);
+        notifyDataSetInvalidated();
+    }
+
+    /**
+     * An array filters constrains the content of the array adapter with a prefix. Each
+     * item that does not start with the supplied prefix is removed from the list.
+     */
+    private class ArrayFilter extends Filter {
+        @Override
+        protected FilterResults performFiltering(final CharSequence search) {
+            final FilterResults results = new FilterResults();
+
+            if (search == null || search.length() == 0) {
+                synchronized (lock) {
+                    results.values = new ArrayList<>(allEvents);
+                    results.count = allEvents.size();
+                }
+            } else {
+                final String searchString = search.toString().toLowerCase(Locale.getDefault());
+                final List<GcEvent> newValues = new ArrayList<>(allEvents.size());
+
+                for (final GcEvent event : allEvents) {
+                    if (event.getName().toLowerCase(Locale.ROOT).contains(searchString)
+                        || event.getOwner().toLowerCase(Locale.ROOT).contains(searchString)) {
+                        newValues.add(event);
+                    }
+                }
+
+                results.values = newValues;
+                results.count = newValues.size();
+            }
+
+            return results;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        protected void publishResults(final CharSequence constraint, final FilterResults results) {
+            events = (List<GcEvent>) results.values;
+            if (results.count > 0) {
+                notifyDataSetChanged();
+            } else {
+                notifyDataSetInvalidated();
+            }
+        }
     }
 
 }

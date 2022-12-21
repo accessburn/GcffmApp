@@ -39,4 +39,5 @@
     <string name="suche">Suche</string>
     <string name="fab_subject">Nachricht zur gcffm-App</string>
     <string name="fab_chooser_title">Mail versenden</string>
+    <string name="action_search">Suche</string>
 </resources>
