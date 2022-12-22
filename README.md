@@ -2,6 +2,8 @@
 
 Android-App für https://gcffm.de.
 
+Init by [pstorch](https://github.com/pstorch/)
+
 - Source: [GitHub](https://github.com/pstorch/GcffmApp)
 - Lizenz: [MIT](LICENSE.txt)
 - Google Play: https://play.google.com/store/apps/details?id=de.gcffm.app
