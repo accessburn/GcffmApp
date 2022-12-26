@@ -11,6 +11,17 @@ Init by [pstorch](https://github.com/pstorch/)
 - Facebook https://facebook.com/gcffm/
 
 ## Info
+
 - Gelb hervorgehobene Events finden heute statt
 - Eventliste wird drei Tage rückwirkend angezeigt
 - Event lange gedrückt halten öffnet Menü
+
+## Build
+
+Define the GCFFM_API_URL variable in your Gradle properties file, e.g.
+under `~/.gradle/gradle.properties`:
+
+```
+GCFFM_API_URL="https://gcffm.de/..."
+
+```

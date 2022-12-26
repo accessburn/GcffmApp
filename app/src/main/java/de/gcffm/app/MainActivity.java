@@ -51,7 +51,6 @@ import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private static final String API_START_URL = "https://gcffm.de/api.php?module=event&action=get&ver=2";
     private static final Pattern COORD_PATTERN = Pattern.compile("([\\d.]+)\\s+([\\d.]+)");
 
     private static final int MENU_CONTEXT_OPEN_ID = 1;
@@ -60,7 +59,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final int MENU_CONTEXT_CALENDAR_ID = 4;
     private static final int MENU_CONTEXT_COPY_COORDS_ID = 5;
     private static final int MENU_CONTEXT_SHARE_ID = 6;
-    private static final int MENU_CONTEXT_SUCHE_ID = 7;
     public static final int ONE_HOUR = 60 * 60 * 1000;
     public static final String TAG = "MainActivity";
     private ListView listView;
@@ -315,7 +313,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             final List<GcEvent> events = new ArrayList<>(count);
 
             try {
-                final URL url = new URL(API_START_URL);
+                final URL url = new URL(BuildConfig.GCFFM_API_URL);
                 connection = (HttpURLConnection) url.openConnection();
                 connection.connect();
 

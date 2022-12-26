@@ -11,6 +11,7 @@ android {
         versionCode 9
         versionName "3.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        buildConfigField "String", "GCFFM_API_URL", GCFFM_API_URL
     }
     buildTypes {
         release {
