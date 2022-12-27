@@ -19,6 +19,16 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+//TRI
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.CompoundButton;
+import android.widget.Switch;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+//TRI
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -65,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private SwipeRefreshLayout swipeContainer;
     private CustomAdapter adapter;
     private String lastSearch;
+    private Switch sw;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -89,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         listView.setAdapter(adapter);
 
         swipeContainer = findViewById(R.id.swipeContainer);
-        swipeContainer.setOnRefreshListener(this::refreshEvents);
+        swipeContainer.setOnRefreshListener( refreshEvents(true) );
 
         // Configure the refreshing colors
         swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
@@ -97,11 +108,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-        refreshEvents();
+        refreshEvents(true);
     }
 
-    private void refreshEvents() {
+    private void refreshEvents( boolean orderByDistance ) {
         swipeContainer.setRefreshing(true);
+        System.out.println("++++" + orderByDistance);
         new Thread(new EventLoader(this)).start();
     }
 
@@ -178,6 +190,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return true;
             }
         });
+        // Switch sortierung Entfernung
+        MenuItem itemswitch = menu.findItem(R.id.switch_action_bar);
+        itemswitch.setActionView(R.layout.use_switch);
+        sw = (Switch) menu.findItem(R.id.switch_action_bar).getActionView().findViewById(R.id.switch2);
+        sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if (isChecked) {
+                    refreshEvents(isChecked);
+                    Toast.makeText(MainActivity.this, R.string.menu_sort, Toast.LENGTH_SHORT).show();
+                } else {
+                    refreshEvents(isChecked);
+                    Toast.makeText(MainActivity.this, R.string.menu_sort, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
 
         final SearchView searchView = (SearchView) searchMenu.getActionView();
         searchView.setSearchableInfo(((SearchManager) getSystemService(Context.SEARCH_SERVICE)).getSearchableInfo(getComponentName()));
@@ -313,6 +344,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             final List<GcEvent> events = new ArrayList<>(count);
 
             try {
+
                 final URL url = new URL(BuildConfig.GCFFM_API_URL);
                 connection = (HttpURLConnection) url.openConnection();
                 connection.connect();
