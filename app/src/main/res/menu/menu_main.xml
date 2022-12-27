@@ -3,6 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="de.storchp.fdroidbuildstatus.MainActivity">
     <item
+        android:id="@+id/switch_action_bar"
+        android:title="Switch"
+        app:actionLayout="@layout/use_switch"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/action_search"
         android:orderInCategory="100"
         android:title="@string/action_search"

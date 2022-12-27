@@ -10,6 +10,8 @@
     <string name="menu_event_open">Event öffnen</string>
     <string name="menu_event_navigate">Navigieren</string>
     <string name="menu_event_copy_geocode">GC-Code kopieren</string>
+    <string name="menu_sort_distanz">Sortiert nach Entfernung</string>
+    <string name="menu_sort_time">Sortiert nach Datum</string>
     <string name="menu_event_add_to_calendar">Zum Kalender hinzufügen</string>
     <string name="geocode">GC-Code</string>
     <string name="coords">Koordinaten</string>
@@ -19,8 +21,8 @@
     <string name="menu_other">Other</string>
     <string name="app_info_text">\n\nApp-Entwicklung: <b><a href="https://github.com/pstorch">Peter Storch</a></b>
         \n<b>Kann Spuren von Tobias Riefer enthalten.</b>
-        "\n\n\n"Source: <b><a href="https://github.com/pstorch/GcffmApp">GitHub</a></b>
-        "\n"Lizenz: <b><a href="https://github.com/pstorch/GcffmApp/blob/master/LICENSE.txt">MIT</a></b>
+        "\n\n\n"Source: <b><a href="https://github.com/accessburn/GcffmApp">GitHub</a></b>
+        "\n"Lizenz: <b><a href="https://github.com/accessburn/GcffmApp/blob/master/LICENSE.txt">MIT</a></b>
         "\n\n"Diese App wurde entwickelt für <b><a href="https://gcffm.de">gcffm.de</a></b>.
         "\n\n\n"Info:
         "\n"- Gelb hervorgehobene Events finden heute statt.
@@ -40,4 +42,5 @@
     <string name="fab_subject">Nachricht zur gcffm-App</string>
     <string name="fab_chooser_title">Mail versenden</string>
     <string name="action_search">Suche</string>
+    <string name="action_sort">Sortieren</string>
 </resources>
