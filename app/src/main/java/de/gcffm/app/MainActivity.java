@@ -6,6 +6,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.text.Html;
@@ -20,13 +21,14 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 //TRI
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.Switch;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+
+
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 //TRI
 
 import androidx.annotation.NonNull;
@@ -75,10 +77,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private SwipeRefreshLayout swipeContainer;
     private CustomAdapter adapter;
     private String lastSearch;
-    private Switch sw;
+    private static Switch sw;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
         final Toolbar toolbar = findViewById(R.id.toolbar);
@@ -100,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         listView.setAdapter(adapter);
 
         swipeContainer = findViewById(R.id.swipeContainer);
-        swipeContainer.setOnRefreshListener( refreshEvents(true) );
+        swipeContainer.setOnRefreshListener(this::refreshEvents);
 
         // Configure the refreshing colors
         swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
@@ -108,12 +111,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-        refreshEvents(true);
+        refreshEvents();
     }
 
-    private void refreshEvents( boolean orderByDistance ) {
+    private void refreshEvents() {
         swipeContainer.setRefreshing(true);
-        System.out.println("++++" + orderByDistance);
         new Thread(new EventLoader(this)).start();
     }
 
@@ -197,13 +199,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
                 if (isChecked) {
-                    refreshEvents(isChecked);
-                    Toast.makeText(MainActivity.this, R.string.menu_sort, Toast.LENGTH_SHORT).show();
+                    refreshEvents();
+                    Toast.makeText(MainActivity.this, R.string.menu_sort_distanz, Toast.LENGTH_SHORT).show();
                 } else {
-                    refreshEvents(isChecked);
-                    Toast.makeText(MainActivity.this, R.string.menu_sort, Toast.LENGTH_SHORT).show();
+                    refreshEvents();
+                    Toast.makeText(MainActivity.this, R.string.menu_sort_time, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -344,8 +345,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             final List<GcEvent> events = new ArrayList<>(count);
 
             try {
+                String SortDistanceURL = "";
+                if (sw != null && sw.isChecked())
+                {
+                    SortDistanceURL = "&order=distanz&lat=&lon=";
+                } else {
+                    SortDistanceURL = "&sort=time";
+                }
 
-                final URL url = new URL(BuildConfig.GCFFM_API_URL);
+                final URL url = new URL(BuildConfig.GCFFM_API_URL + SortDistanceURL);
+                System.out.println(url);
                 connection = (HttpURLConnection) url.openConnection();
                 connection.connect();
 

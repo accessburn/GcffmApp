@@ -10,7 +10,8 @@
     <string name="menu_event_open">Event öffnen</string>
     <string name="menu_event_navigate">Navigieren</string>
     <string name="menu_event_copy_geocode">GC-Code kopieren</string>
-    <string name="menu_sort">Sortiert nach Entfernung</string>
+    <string name="menu_sort_distanz">Sortiert nach Entfernung</string>
+    <string name="menu_sort_time">Sortiert nach Datum</string>
     <string name="menu_event_add_to_calendar">Zum Kalender hinzufügen</string>
     <string name="geocode">GC-Code</string>
     <string name="coords">Koordinaten</string>
