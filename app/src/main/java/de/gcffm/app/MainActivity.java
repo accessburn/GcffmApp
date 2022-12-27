@@ -1,12 +1,18 @@
 package de.gcffm.app;
 
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+
+import android.Manifest;
 import android.app.SearchManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.text.Html;
@@ -20,22 +26,15 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-//TRI
-import android.widget.CompoundButton;
-import android.widget.Switch;
-import androidx.appcompat.app.AppCompatActivity;
-
-
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-//TRI
-
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -73,11 +72,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final int MENU_CONTEXT_SHARE_ID = 6;
     public static final int ONE_HOUR = 60 * 60 * 1000;
     public static final String TAG = "MainActivity";
-    private ListView listView;
     private SwipeRefreshLayout swipeContainer;
     private CustomAdapter adapter;
     private String lastSearch;
-    private static Switch sw;
+    private SwitchCompat sw;
+    private Location lastKnownLocation;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -96,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         final NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        listView = findViewById(R.id.listView);
+        ListView listView = findViewById(R.id.listView);
         registerForContextMenu(listView);
 
         adapter = new CustomAdapter(this, R.layout.item, new ArrayList<>());
@@ -114,9 +113,46 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         refreshEvents();
     }
 
+
+    ActivityResultLauncher<String[]> locationPermissionRequest =
+            registerForActivityResult(new ActivityResultContracts
+                            .RequestMultiplePermissions(), result -> {
+                        Boolean coarseLocationGranted = result.get(ACCESS_COARSE_LOCATION);
+                        if (coarseLocationGranted != null && coarseLocationGranted) {
+                            refreshEvents();
+                        } else if (sw != null) {
+                            Toast.makeText(MainActivity.this, R.string.no_location_permission_granted, Toast.LENGTH_SHORT).show();
+                            sw.setChecked(false);
+                        }
+                    }
+            );
+
     private void refreshEvents() {
         swipeContainer.setRefreshing(true);
-        new Thread(new EventLoader(this)).start();
+
+        boolean orderByDistance = sw != null && sw.isChecked();
+
+        if (orderByDistance) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                locationPermissionRequest.launch(new String[]{
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                });
+                return;
+            }
+
+            LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+            String bestProvider = locationManager.getBestProvider(new Criteria(), true);
+            if (bestProvider != null) {
+                lastKnownLocation = locationManager.getLastKnownLocation(bestProvider);
+            }
+            if (lastKnownLocation == null) {
+                Toast.makeText(MainActivity.this, R.string.no_location, Toast.LENGTH_SHORT).show();
+                sw.setChecked(false);
+                Toast.makeText(MainActivity.this, R.string.menu_sort_time, Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        new Thread(new EventLoader(this, orderByDistance, lastKnownLocation)).start();
     }
 
     @Override
@@ -195,20 +231,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Switch sortierung Entfernung
         MenuItem itemswitch = menu.findItem(R.id.switch_action_bar);
         itemswitch.setActionView(R.layout.use_switch);
-        sw = (Switch) menu.findItem(R.id.switch_action_bar).getActionView().findViewById(R.id.switch2);
-        sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    refreshEvents();
-                    Toast.makeText(MainActivity.this, R.string.menu_sort_distanz, Toast.LENGTH_SHORT).show();
-                } else {
-                    refreshEvents();
-                    Toast.makeText(MainActivity.this, R.string.menu_sort_time, Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
+        sw = (SwitchCompat) menu.findItem(R.id.switch_action_bar).getActionView().findViewById(R.id.switch2);
+        sw.setOnCheckedChangeListener((buttonView, isChecked) -> refreshEvents());
 
 
         final SearchView searchView = (SearchView) searchMenu.getActionView();
@@ -294,13 +318,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void ShareTheEvent(final int label, final String text) {
-        final ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-        final ClipData clip = ClipData.newPlainText(getResources().getString(label), text);
-        clipboard.setPrimaryClip(clip);
-        Toast.makeText(this, getResources().getString(R.string.copied_to_clipboard, getResources().getString(label)), Toast.LENGTH_LONG).show();
-    }
-
     private void copyToClipboard(final int label, final String text) {
         final ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         final ClipData clip = ClipData.newPlainText(getResources().getString(label), text);
@@ -319,9 +336,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static class EventLoader implements Runnable {
 
         private final WeakReference<MainActivity> mainActivityRef;
+        private final boolean orderByDistance;
+        private final Location location;
 
-        protected EventLoader(final MainActivity mainActivity) {
-            mainActivityRef = new WeakReference<>(mainActivity);
+        protected EventLoader(final MainActivity mainActivity, boolean orderByDistance, final Location location) {
+            this.mainActivityRef = new WeakReference<>(mainActivity);
+            this.orderByDistance = orderByDistance;
+            this.location = location;
             enableHttpResponseCache(mainActivity);
         }
 
@@ -345,10 +366,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             final List<GcEvent> events = new ArrayList<>(count);
 
             try {
-                String SortDistanceURL = "";
-                if (sw != null && sw.isChecked())
-                {
-                    SortDistanceURL = "&order=distanz&lat=&lon=";
+                String SortDistanceURL;
+                if (orderByDistance && location != null) {
+                    SortDistanceURL = "&order=distanz&lat=" + location.getLatitude() + "&lon=" + location.getLongitude();
                 } else {
                     SortDistanceURL = "&sort=time";
                 }

@@ -43,4 +43,6 @@
     <string name="fab_chooser_title">Mail versenden</string>
     <string name="action_search">Suche</string>
     <string name="action_sort">Sortieren</string>
+    <string name="no_location">Kann Standort nicht ermitteln</string>
+    <string name="no_location_permission_granted">Keine Berechtigung zur Standortabfrage</string>
 </resources>
