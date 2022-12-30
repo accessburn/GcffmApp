@@ -9,9 +9,11 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -73,6 +75,7 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
             final TextView name = view.findViewById(R.id.eventName);
             final TextView type = view.findViewById(R.id.eventType);
             final TextView owner = view.findViewById(R.id.eventOwner);
+            final ImageView icon = view.findViewById(R.id.eventIcon);
             final float alpha = p.isPast() ? 0.5f : 1.0f;
 
             final DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
@@ -102,6 +105,8 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
             type.setAlpha(alpha);
             owner.setText(p.getOwner());
             owner.setAlpha(alpha);
+
+            icon.setImageDrawable(ResourcesCompat.getDrawable(context.getResources(), p.getType().getIconRessourceId(), null));
         }
 
         return view;

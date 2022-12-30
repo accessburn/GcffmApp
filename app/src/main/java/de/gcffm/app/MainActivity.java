@@ -9,7 +9,6 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -20,21 +19,24 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextThemeWrapper;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.SwitchCompat;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -57,10 +59,14 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.gcffm.app.databinding.ActivityMain2Binding;
+import de.gcffm.app.databinding.MaxKmDialogBinding;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -75,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final int MENU_CONTEXT_SHARE_ID = 6;
     public static final int ONE_HOUR = 60 * 60 * 1000;
     public static final String TAG = "MainActivity";
+    public static final int MAX_KM_UNLIMITED = 200;
     private SwipeRefreshLayout swipeContainer;
     private CustomAdapter adapter;
     private String lastSearch;
@@ -85,26 +92,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(final Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
-        final Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        ActivityMain2Binding binding = ActivityMain2Binding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        setSupportActionBar(binding.appBarMain2.toolbar);
 
-        final DrawerLayout drawer = findViewById(R.id.drawer_layout);
         final ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
+                this, binding.drawerLayout, binding.appBarMain2.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        binding.drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        final NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        binding.navView.setNavigationItemSelectedListener(this);
 
-        ListView listView = findViewById(R.id.listView);
+        ListView listView = binding.appBarMain2.contentMain2.listView;
         registerForContextMenu(listView);
 
         adapter = new CustomAdapter(this, R.layout.item, new ArrayList<>());
         listView.setAdapter(adapter);
 
-        swipeContainer = findViewById(R.id.swipeContainer);
+        swipeContainer = binding.appBarMain2.contentMain2.swipeContainer;
         swipeContainer.setOnRefreshListener(this::refreshEvents);
 
         // Configure the refreshing colors
@@ -125,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             refreshEvents();
                         } else if (sw != null) {
                             Toast.makeText(MainActivity.this, R.string.no_location_permission_granted, Toast.LENGTH_SHORT).show();
-                            sw.setChecked(false);
+                            setSortByTime();
                         }
                     }
             );
@@ -150,12 +155,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             if (lastKnownLocation == null) {
                 Toast.makeText(MainActivity.this, R.string.no_location, Toast.LENGTH_SHORT).show();
-                sw.setChecked(false);
+                setSortByTime();
                 Toast.makeText(MainActivity.this, R.string.menu_sort_time, Toast.LENGTH_SHORT).show();
             }
         }
 
-        new Thread(new EventLoader(this, orderByDistance, lastKnownLocation)).start();
+        new Thread(new EventLoader(this, orderByDistance, PreferencesUtils.getMaxKm(this), lastKnownLocation, PreferencesUtils.getEventFilter(this))).start();
+    }
+
+    private void setSortByTime() {
+        sw.setChecked(false);
+        PreferencesUtils.setSortByDistance(this, false);
     }
 
     @Override
@@ -188,6 +198,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.menuItemFacebook) {
             final Uri uri = Uri.parse("https://www.facebook.com/gcffm/");
             startActivity(new Intent(Intent.ACTION_VIEW, uri));
+        } else if (id == R.id.menuItemMaxKm) {
+            showMaxKmDialog();
+        } else if (id == R.id.menuItemEventFilter) {
+            showEventFilterDialog();
         }
 
         final DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -198,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onCreateContextMenu(final ContextMenu menu, final View v, final ContextMenu.ContextMenuInfo menuInfo) {
         final AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        final GcEvent event = (GcEvent) adapter.getItem(acmi.position);
+        final GcEvent event = adapter.getItem(acmi.position);
 
         if (v.getId() == R.id.listView) {
             menu.add(Menu.NONE, MENU_CONTEXT_OPEN_ID, Menu.NONE, R.string.menu_event_open);
@@ -234,9 +248,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Switch sortierung Entfernung
         MenuItem itemswitch = menu.findItem(R.id.switch_action_bar);
         itemswitch.setActionView(R.layout.use_switch);
-        sw = (SwitchCompat) menu.findItem(R.id.switch_action_bar).getActionView().findViewById(R.id.switch2);
-        sw.setOnCheckedChangeListener((buttonView, isChecked) -> refreshEvents());
-
+        sw = menu.findItem(R.id.switch_action_bar).getActionView().findViewById(R.id.switch2);
+        sw.setChecked(PreferencesUtils.getSortByDistance(this));
+        sw.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            PreferencesUtils.setSortByDistance(this, isChecked);
+            refreshEvents();
+        });
 
         final SearchView searchView = (SearchView) searchMenu.getActionView();
         searchView.setSearchableInfo(((SearchManager) getSystemService(Context.SEARCH_SERVICE)).getSearchableInfo(getComponentName()));
@@ -269,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onContextItemSelected(final MenuItem item) {
         final AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        final GcEvent event = (GcEvent) adapter.getItem(acmi.position);
+        final GcEvent event = adapter.getItem(acmi.position);
 
         switch (item.getItemId()) {
             case MENU_CONTEXT_OPEN_ID:
@@ -340,11 +357,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         private final WeakReference<MainActivity> mainActivityRef;
         private final boolean orderByDistance;
+        private final int maxKm;
+        private final Set<String> eventFilter;
         private final Location location;
 
-        protected EventLoader(final MainActivity mainActivity, boolean orderByDistance, final Location location) {
+        protected EventLoader(final MainActivity mainActivity, boolean orderByDistance, int maxKm, final Location location, Set<String> eventFilter) {
             this.mainActivityRef = new WeakReference<>(mainActivity);
             this.orderByDistance = orderByDistance;
+            this.maxKm = maxKm;
+            this.eventFilter = eventFilter;
             this.location = location;
             enableHttpResponseCache(mainActivity);
         }
@@ -370,17 +391,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             final MainActivity mainActivity = mainActivityRef.get();
 
             try {
-                String SortDistanceURL;
+                String urlParameter;
                 if (orderByDistance && location != null) {
                     mainActivity.runOnUiThread(() -> Toast.makeText(mainActivity, R.string.menu_sort_distanz, Toast.LENGTH_SHORT).show());
-                    SortDistanceURL = "&order=distanz&lat=" + location.getLatitude() + "&lon=" + location.getLongitude();
+                    urlParameter = "&order=distanz&lat=" + location.getLatitude() + "&lon=" + location.getLongitude();
+                    if (maxKm < MAX_KM_UNLIMITED) {
+                        urlParameter += "&km=" + maxKm;
+                    }
                 } else {
                     mainActivity.runOnUiThread(() -> Toast.makeText(mainActivity, R.string.menu_sort_time, Toast.LENGTH_SHORT).show());
-                    SortDistanceURL = "&sort=time";
+                    urlParameter = "&sort=time";
                 }
 
-                final URL url = new URL(BuildConfig.GCFFM_API_URL + SortDistanceURL);
-                System.out.println(BuildConfig.GCFFM_API_URL + SortDistanceURL);
+                StringBuilder event = new StringBuilder();
+                for (String eventType : eventFilter) {
+                    if (event.length() > 0) {
+                        event.append("|");
+                    }
+                    event.append(eventType.toLowerCase(Locale.ROOT));
+                }
+                urlParameter += "&event=" + event;
+
+                final URL url = new URL(BuildConfig.GCFFM_API_URL + urlParameter);
+                System.out.println(BuildConfig.GCFFM_API_URL + urlParameter);
                 System.out.println(url);
                 connection = (HttpURLConnection) url.openConnection();
                 connection.connect();
@@ -402,23 +435,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 for (int i = 0; i < eventList.length(); i++) {
                     final JSONObject jsonObj = (JSONObject) eventList.get(i);
 
-                    final GcEvent event = new GcEvent();
-                    event.setName(jsonObj.getString("name"));
-                    event.setGeocode(jsonObj.getString("geocode"));
-                    event.setOwner(jsonObj.getString("owner"));
-                    event.setType(EventType.byName(jsonObj.getString("type")));
+                    final GcEvent gcEvent = new GcEvent();
+                    gcEvent.setName(jsonObj.getString("name"));
+                    gcEvent.setGeocode(jsonObj.getString("geocode"));
+                    gcEvent.setOwner(jsonObj.getString("owner"));
+                    gcEvent.setType(EventType.byName(jsonObj.getString("type")));
 
                     final String coord = jsonObj.getString("coord");
                     final Matcher matcher = COORD_PATTERN.matcher(coord);
                     if (matcher.find()) {
-                        event.setLat(Double.parseDouble(Objects.requireNonNull(matcher.group(1))));
-                        event.setLon(Double.parseDouble(Objects.requireNonNull(matcher.group(2))));
+                        gcEvent.setLat(Double.parseDouble(Objects.requireNonNull(matcher.group(1))));
+                        gcEvent.setLon(Double.parseDouble(Objects.requireNonNull(matcher.group(2))));
                     }
 
-                    event.setDatum(Long.parseLong(jsonObj.getString("datum")) * 1000);
+                    gcEvent.setDatum(Long.parseLong(jsonObj.getString("datum")) * 1000);
                     final long enddatum = Long.parseLong(jsonObj.getString("enddatum"));
-                    event.setEndDatum(enddatum > 0 ? enddatum * 1000 : event.getDatum() + ONE_HOUR);
-                    events.add(event);
+                    gcEvent.setEndDatum(enddatum > 0 ? enddatum * 1000 : gcEvent.getDatum() + ONE_HOUR);
+                    events.add(gcEvent);
                 }
                 onFinished(events, null);
             } catch (final Exception e) {
@@ -461,6 +494,88 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 searchList(lastSearch);
             }
         }
+    }
+
+    private void showMaxKmDialog() {
+        MaxKmDialogBinding binding = MaxKmDialogBinding.inflate(LayoutInflater.from(this));
+        int currentMaxKm = PreferencesUtils.getMaxKm(this);
+        setMaxKmText(binding, currentMaxKm);
+        binding.sbMaxKm.setProgress(currentMaxKm);
+        binding.sbMaxKm.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                int progress = binding.sbMaxKm.getProgress();
+                setMaxKmText(binding, progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        AlertDialog alertDialog = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AlertDialogCustom))
+                .setView(binding.getRoot())
+                .setIcon(R.drawable.icon_1)
+                .setTitle(R.string.app_name)
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.ok, null)
+                .setNegativeButton(android.R.string.cancel, null)
+                .create();
+        alertDialog.show();
+
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            PreferencesUtils.setMaxKm(this, binding.sbMaxKm.getProgress());
+            alertDialog.dismiss();
+            if (sw.isChecked()) {
+                refreshEvents();
+            }
+        });
+    }
+
+    private void setMaxKmText(final MaxKmDialogBinding binding, final int maxKm) {
+        if (maxKm < MAX_KM_UNLIMITED) {
+            binding.maxKm.setText(getString(R.string.max_km_info, String.valueOf(Math.max(maxKm, 1))));
+        } else {
+            binding.maxKm.setText(getString(R.string.max_km_info, getString(R.string.max_km_unlimited)));
+        }
+    }
+
+    private void showEventFilterDialog() {
+        Set<String> eventFilter = PreferencesUtils.getEventFilter(this);
+        EventType[] values = EventType.values();
+        String[] eventNames = new String[values.length];
+        boolean[] selected = new boolean[values.length];
+        for (int i = 0; i < values.length; i++) {
+            eventNames[i] = values[i].getDescription();
+            selected[i] = eventFilter.contains(values[i].name());
+        }
+
+        AlertDialog alertDialog = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AlertDialogCustom))
+                .setIcon(R.mipmap.ic_launcher)
+                .setTitle(R.string.event_filter)
+                .setMultiChoiceItems(eventNames, selected,
+                        (dialog, which, isChecked) -> {
+                            String name = values[which].name();
+                            if (isChecked) {
+                                eventFilter.add(name);
+                            } else eventFilter.remove(name);
+                        })
+                .setPositiveButton(android.R.string.ok, null)
+                .setNegativeButton(android.R.string.cancel, null)
+                .create();
+        alertDialog.show();
+
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            PreferencesUtils.setEventFilter(MainActivity.this, eventFilter);
+            alertDialog.dismiss();
+            refreshEvents();
+        });
     }
 
 }
