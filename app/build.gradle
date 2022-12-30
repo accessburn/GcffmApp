@@ -8,7 +8,7 @@ android {
         applicationId "de.gcffm.app"
         minSdkVersion 21
         targetSdkVersion 33
-        versionCode 9
+        versionCode 10
         versionName "3.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         buildConfigField "String", "GCFFM_API_URL", GCFFM_API_URL

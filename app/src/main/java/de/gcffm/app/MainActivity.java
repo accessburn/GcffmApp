@@ -9,6 +9,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -59,6 +60,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -364,16 +367,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             BufferedReader reader = null;
             int count = 0;
             final List<GcEvent> events = new ArrayList<>(count);
+            final MainActivity mainActivity = mainActivityRef.get();
 
             try {
                 String SortDistanceURL;
                 if (orderByDistance && location != null) {
+                    mainActivity.runOnUiThread(() -> Toast.makeText(mainActivity, R.string.menu_sort_distanz, Toast.LENGTH_SHORT).show());
                     SortDistanceURL = "&order=distanz&lat=" + location.getLatitude() + "&lon=" + location.getLongitude();
                 } else {
+                    mainActivity.runOnUiThread(() -> Toast.makeText(mainActivity, R.string.menu_sort_time, Toast.LENGTH_SHORT).show());
                     SortDistanceURL = "&sort=time";
                 }
 
                 final URL url = new URL(BuildConfig.GCFFM_API_URL + SortDistanceURL);
+                System.out.println(BuildConfig.GCFFM_API_URL + SortDistanceURL);
                 System.out.println(url);
                 connection = (HttpURLConnection) url.openConnection();
                 connection.connect();
