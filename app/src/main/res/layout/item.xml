@@ -14,14 +14,25 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:id="@+id/eventDate"
-        android:layout_alignParentStart="true"/>
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:id="@+id/eventCoord"
-        android:layout_alignParentEnd="true"/>
+        android:layout_alignParentEnd="true" />
+
+    <ImageView
+        android:id="@+id/eventIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="6dp"
+        android:src="@drawable/type_event"
+        android:layout_below="@+id/eventDate"
+        android:layout_alignParentStart="true"
+        android:contentDescription="@string/event_type" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -30,7 +41,7 @@
         android:id="@+id/eventName"
         android:textStyle="bold"
         android:layout_below="@+id/eventDate"
-        android:layout_alignParentStart="true"/>
+        android:layout_toEndOf="@id/eventIcon" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -38,7 +49,7 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:id="@+id/eventType"
         android:layout_below="@+id/eventName"
-        android:layout_alignParentStart="true"/>
+        android:layout_toEndOf="@+id/eventIcon" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -46,7 +57,7 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:id="@+id/eventOwner"
         android:layout_below="@+id/eventName"
-        android:layout_alignParentEnd="true"/>
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>
 

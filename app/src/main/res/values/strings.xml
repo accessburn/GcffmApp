@@ -45,4 +45,13 @@
     <string name="action_sort">Sortieren</string>
     <string name="no_location">Kann Standort nicht ermitteln</string>
     <string name="no_location_permission_granted">Keine Berechtigung zur Standortabfrage</string>
+    <string name="max_km">Events bis x Kilometer</string>
+    <string name="schreib_uns">Schreib uns</string>
+    <string name="max_km_unlimited">unbegrenzt</string>
+    <string name="max_km_info">Events bis %s km</string>
+    <string name="event_type">Eventtyp</string>
+    <string name="event_filter">Eventfilter</string>
+    <string name="PREF_MAX_KM" translatable="false">PREF_MAX_KM</string>
+    <string name="PREF_EVENT_FILTER" translatable="false">PREF_EVENT_FILTER</string>
+    <string name="PREF_SORT_BY_DISTANCE" translatable="false">PREF_SORT_BY_DISTANCE</string>
 </resources>
