@@ -60,18 +60,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import de.gcffm.app.databinding.ActivityMain2Binding;
 import de.gcffm.app.databinding.MaxKmDialogBinding;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-
-    private static final Pattern COORD_PATTERN = Pattern.compile("([\\d.]+)\\s+([\\d.]+)");
 
     private static final int MENU_CONTEXT_OPEN_ID = 1;
     private static final int MENU_CONTEXT_NAVIGATE_ID = 2;
@@ -440,14 +435,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     gcEvent.setGeocode(jsonObj.getString("geocode"));
                     gcEvent.setOwner(jsonObj.getString("owner"));
                     gcEvent.setType(EventType.byName(jsonObj.getString("type")));
-
-                    final String coord = jsonObj.getString("coord");
-                    final Matcher matcher = COORD_PATTERN.matcher(coord);
-                    if (matcher.find()) {
-                        gcEvent.setLat(Double.parseDouble(Objects.requireNonNull(matcher.group(1))));
-                        gcEvent.setLon(Double.parseDouble(Objects.requireNonNull(matcher.group(2))));
-                    }
-
+                    gcEvent.setLat(jsonObj.getDouble("lat"));
+                    gcEvent.setLon(jsonObj.getDouble("lon"));
                     gcEvent.setDatum(Long.parseLong(jsonObj.getString("datum")) * 1000);
                     final long enddatum = Long.parseLong(jsonObj.getString("enddatum"));
                     gcEvent.setEndDatum(enddatum > 0 ? enddatum * 1000 : gcEvent.getDatum() + ONE_HOUR);
