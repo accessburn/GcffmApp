@@ -209,16 +209,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         final AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
         final GcEvent event = adapter.getItem(acmi.position);
 
-        if (v.getId() == R.id.listView) {
-            menu.add(Menu.NONE, MENU_CONTEXT_OPEN_ID, Menu.NONE, R.string.menu_event_open);
-            if (!event.isPast()) {
-                menu.add(Menu.NONE, MENU_CONTEXT_NAVIGATE_ID, Menu.NONE, R.string.menu_event_navigate);
-            }
-            menu.add(Menu.NONE, MENU_CONTEXT_COPY_GEOCODE_ID, Menu.NONE, R.string.menu_event_copy_geocode);
-            menu.add(Menu.NONE, MENU_CONTEXT_COPY_COORDS_ID, Menu.NONE, R.string.menu_event_copy_coords);
-            if (!event.isPast()) {
-                menu.add(Menu.NONE, MENU_CONTEXT_CALENDAR_ID, Menu.NONE, R.string.menu_event_add_to_calendar);
-                menu.add(Menu.NONE, MENU_CONTEXT_SHARE_ID, Menu.NONE, R.string.menu_event_share);
+        if (!event.getType().toString().equals("NEWS"))
+        {
+            if (v.getId() == R.id.listView) {
+                menu.add(Menu.NONE, MENU_CONTEXT_OPEN_ID, Menu.NONE, R.string.menu_event_open);
+                if (!event.isPast()) {
+                    menu.add(Menu.NONE, MENU_CONTEXT_NAVIGATE_ID, Menu.NONE, R.string.menu_event_navigate);
+                }
+                menu.add(Menu.NONE, MENU_CONTEXT_COPY_GEOCODE_ID, Menu.NONE, R.string.menu_event_copy_geocode);
+                menu.add(Menu.NONE, MENU_CONTEXT_COPY_COORDS_ID, Menu.NONE, R.string.menu_event_copy_coords);
+                if (!event.isPast()) {
+                    menu.add(Menu.NONE, MENU_CONTEXT_CALENDAR_ID, Menu.NONE, R.string.menu_event_add_to_calendar);
+                    menu.add(Menu.NONE, MENU_CONTEXT_SHARE_ID, Menu.NONE, R.string.menu_event_share);
+                }
             }
         }
     }

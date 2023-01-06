@@ -106,7 +106,7 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
                     view.setBackgroundResource(R.drawable.item_list_backgroundcolor2);
                 }
             }
-System.out.println(p.getType().getDescription());
+
             type.setText(p.getType().getDescription());
             type.setAlpha(alpha);
             owner.setText(p.getOwner());
