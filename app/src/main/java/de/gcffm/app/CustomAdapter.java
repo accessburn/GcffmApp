@@ -72,7 +72,6 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
             TextView date = view.findViewById(R.id.eventDate);
             TextView distanz = view.findViewById(R.id.eventDistanz);
             TextView name = view.findViewById(R.id.eventName);
-            TextView type = view.findViewById(R.id.eventType);
             TextView owner = view.findViewById(R.id.eventOwner);
             TextView bundeslandOrt = view.findViewById(R.id.eventBundeslandOrt);
             ImageView icon = view.findViewById(R.id.eventIcon);
@@ -107,11 +106,9 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
                 }
             }
 
-            type.setText(p.getType().getDescription());
-            type.setAlpha(alpha);
             owner.setText(p.getOwner());
             owner.setAlpha(alpha);
-            bundeslandOrt.setText(context.getString(R.string.bundeslandOrt, p.getBundesland(), p.getOrt()));
+            bundeslandOrt.setText(context.getString(R.string.bundeslandOrt, p.getOrt(), p.getBundesland()));
             bundeslandOrt.setAlpha(alpha);
 
             icon.setImageDrawable(ResourcesCompat.getDrawable(context.getResources(), p.getType().getIconRessourceId(), null));

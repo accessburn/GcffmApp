@@ -58,5 +58,5 @@
     <string name="PREF_EVENT_FILTER" translatable="false">PREF_EVENT_FILTER</string>
     <string name="PREF_SORT_BY_DISTANCE" translatable="false">PREF_SORT_BY_DISTANCE</string>
     <string name="distanz">%d km</string>
-    <string name="bundeslandOrt">%s, %s</string>
+    <string name="bundeslandOrt">%s %s</string>
 </resources>
