@@ -78,7 +78,8 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
             final ImageView icon = view.findViewById(R.id.eventIcon);
             final float alpha = p.isPast() ? 0.5f : 1.0f;
 
-            final DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+            final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE dd.MM.yy HH:mm");
+            System.out.println("getEndDatum: " + p.getEndDatum());
             date.setText(dateFormat.format(p.getDatumAsCalendar().getTime()));
             date.setAlpha(alpha);
             coord.setText(p.getCoords());
