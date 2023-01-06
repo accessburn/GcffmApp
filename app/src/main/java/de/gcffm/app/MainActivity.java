@@ -252,8 +252,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void showPopupMenu(final GcEvent event) {
-        copyToClipboard(R.string.coords, event.getCoords());
-
         List<String> menuList = new ArrayList<>();
         menuList.add(getString(R.string.menu_event_open));
         if (!event.isPast()) {
