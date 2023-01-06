@@ -110,6 +110,8 @@ public class EventLoader implements Runnable {
                 gcEvent.setLon(jsonObj.getDouble("lon"));
                 gcEvent.setDistanz(jsonObj.getDouble("distanz"));
                 gcEvent.setDatum(Long.parseLong(jsonObj.getString("datum")) * 1000);
+                gcEvent.setOrt(jsonObj.getString("ort"));
+                gcEvent.setBundesland(jsonObj.getString("bl"));
                 long enddatum = Long.parseLong(jsonObj.getString("enddatum"));
                 gcEvent.setEndDatum(enddatum > 0 ? enddatum * 1000 : gcEvent.getDatum() + MainActivity.ONE_HOUR);
                 events.add(gcEvent);

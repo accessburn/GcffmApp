@@ -70,10 +70,11 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
 
         if (p != null) {
             TextView date = view.findViewById(R.id.eventDate);
-            TextView coord = view.findViewById(R.id.eventCoord);
+            TextView distanz = view.findViewById(R.id.eventDistanz);
             TextView name = view.findViewById(R.id.eventName);
             TextView type = view.findViewById(R.id.eventType);
             TextView owner = view.findViewById(R.id.eventOwner);
+            TextView bundeslandOrt = view.findViewById(R.id.eventBundeslandOrt);
             ImageView icon = view.findViewById(R.id.eventIcon);
             float alpha = p.isPast() ? 0.5f : 1.0f;
 
@@ -81,8 +82,8 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
             System.out.println("getEndDatum: " + p.getEndDatum());
             date.setText(dateFormat.format(p.getDatumAsCalendar().getTime()));
             date.setAlpha(alpha);
-            coord.setText(p.getCoords());
-            coord.setAlpha(alpha);
+            distanz.setText(context.getString(R.string.distanz, (int) p.getDistanz()));
+            distanz.setAlpha(alpha);
 
             if (Build.VERSION.SDK_INT >= 24) {
                 name.setText(Html.fromHtml(p.getName(), Html.FROM_HTML_MODE_LEGACY));
@@ -110,6 +111,8 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
             type.setAlpha(alpha);
             owner.setText(p.getOwner());
             owner.setAlpha(alpha);
+            bundeslandOrt.setText(context.getString(R.string.bundeslandOrt, p.getBundesland(), p.getOrt()));
+            bundeslandOrt.setAlpha(alpha);
 
             icon.setImageDrawable(ResourcesCompat.getDrawable(context.getResources(), p.getType().getIconRessourceId(), null));
         }

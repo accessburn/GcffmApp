@@ -18,13 +18,10 @@ import android.provider.CalendarContract;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -92,6 +89,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         adapter = new CustomAdapter(this, R.layout.item, new ArrayList<>());
         listView.setAdapter(adapter);
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            GcEvent event = adapter.getItem(position);
+            if (event.getType() != EventType.NEWS) {
+                showPopupMenu(event);
+            }
+        });
 
         swipeContainer = binding.appBarMain2.contentMain2.swipeContainer;
         swipeContainer.setOnRefreshListener(this::refreshEvents);
@@ -194,25 +197,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        GcEvent event = adapter.getItem(acmi.position);
-
-        if (event.getType() != EventType.NEWS && v.getId() == R.id.listView) {
-            menu.add(Menu.NONE, MENU_CONTEXT_OPEN_ID, Menu.NONE, R.string.menu_event_open);
-            if (!event.isPast()) {
-                menu.add(Menu.NONE, MENU_CONTEXT_NAVIGATE_ID, Menu.NONE, R.string.menu_event_navigate);
-            }
-            menu.add(Menu.NONE, MENU_CONTEXT_COPY_GEOCODE_ID, Menu.NONE, R.string.menu_event_copy_geocode);
-            menu.add(Menu.NONE, MENU_CONTEXT_COPY_COORDS_ID, Menu.NONE, R.string.menu_event_copy_coords);
-            if (!event.isPast()) {
-                menu.add(Menu.NONE, MENU_CONTEXT_CALENDAR_ID, Menu.NONE, R.string.menu_event_add_to_calendar);
-                menu.add(Menu.NONE, MENU_CONTEXT_SHARE_ID, Menu.NONE, R.string.menu_event_share);
-            }
-        }
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(@NonNull Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
@@ -267,58 +251,69 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         adapter.getFilter().filter(search);
     }
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        GcEvent event = adapter.getItem(acmi.position);
+    private void showPopupMenu(final GcEvent event) {
+        copyToClipboard(R.string.coords, event.getCoords());
 
-        switch (item.getItemId()) {
-            case MENU_CONTEXT_OPEN_ID:
-                Uri uri = Uri.parse(event.getCoordInfoUrl());
-                startActivity(new Intent(Intent.ACTION_VIEW, uri));
-                return true;
-            case MENU_CONTEXT_NAVIGATE_ID:
-                String location = String.format("geo:0,0?q=%s(%s)", event.getDecimalCoords(), event.getName());
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(location)));
-                return true;
-            case MENU_CONTEXT_COPY_GEOCODE_ID:
-                copyToClipboard(R.string.geocode, event.getGeocode());
-                return true;
-            case MENU_CONTEXT_COPY_COORDS_ID:
-                copyToClipboard(R.string.coords, event.getCoords());
-                return true;
-            case MENU_CONTEXT_CALENDAR_ID:
-                Intent intent = new Intent(Intent.ACTION_INSERT)
-                        .setData(Uri.parse("content://com.android.calendar/events"))
-                        .putExtra(CalendarContract.Events.TITLE, stripHtml(event.getName()))
-                        .putExtra(CalendarContract.Events.HAS_ALARM, false)
-                        .putExtra(CalendarContract.Events.DESCRIPTION, event.getCalendarDescription())
-                        .putExtra(CalendarContract.Events.EVENT_TIMEZONE, GcEvent.GCFFM_TIMEZONE);
-                intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.getDatum());
-                intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, event.getEndDatum());
-                intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, false);
-                intent.putExtra(CalendarContract.Events.EVENT_LOCATION, event.getCoords());
-                startActivity(intent);
-                return true;
-            case MENU_CONTEXT_SHARE_ID:
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Geocaching Event");
-                String shareMessage = "\nHallo, kommst du zu diesem Event?\n\n";
-                DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+        List<String> menuList = new ArrayList<>();
+        menuList.add(getString(R.string.menu_event_open));
+        if (!event.isPast()) {
+            menuList.add(getString(R.string.menu_event_navigate));
+        }
+        menuList.add(getString(R.string.menu_event_copy_geocode));
+        menuList.add(getString(R.string.menu_event_copy_coords));
+        if (!event.isPast()) {
+            menuList.add(getString(R.string.menu_event_add_to_calendar));
+            menuList.add(getString(R.string.menu_event_share));
+        }
+        String[] menuEntries = menuList.toArray(new String[]{});
 
-                shareMessage = shareMessage + "https://coord.info/" + event.getGeocode()
-                        + "\n\nStart:\n" + dateFormat.format(event.getDatum()) + " Uhr"
-                        + "\n\nKoordinaten:\nhttps://www.google.de/maps/search/" + event.getDecimalCoords() + "/"
-                        + "\n\nOwner:\n" + event.getOwner()
-                        + "\n\nEin Service von https://gcffm.de";
-                shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
-                startActivity(Intent.createChooser(shareIntent, "choose one"));
+        AlertDialog alertDialog = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AlertDialogCustom))
+                .setIcon(R.mipmap.ic_launcher)
+                .setTitle(event.getCoords())
+                .setItems(menuEntries,
+                        (dialog, which) -> onPopupMenuItemSelected(menuEntries[which], event))
+                .setPositiveButton(android.R.string.ok, null)
+                .create();
+        alertDialog.show();
+    }
 
+    private void onPopupMenuItemSelected(String menuName, GcEvent event) {
+        if (menuName.equals(getString(R.string.menu_event_open))) {
+            Uri uri = Uri.parse(event.getCoordInfoUrl());
+            startActivity(new Intent(Intent.ACTION_VIEW, uri));
+        } else if (menuName.equals(getString(R.string.menu_event_navigate))) {
+            String location = String.format("geo:0,0?q=%s(%s)", event.getDecimalCoords(), event.getName());
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(location)));
+        } else if (menuName.equals(getString(R.string.menu_event_copy_geocode))) {
+            copyToClipboard(R.string.geocode, event.getGeocode());
+        } else if (menuName.equals(getString(R.string.menu_event_copy_coords))) {
+            copyToClipboard(R.string.coords, event.getCoords());
+        } else if (menuName.equals(getString(R.string.menu_event_add_to_calendar))) {
+            Intent intent = new Intent(Intent.ACTION_INSERT)
+                    .setData(Uri.parse("content://com.android.calendar/events"))
+                    .putExtra(CalendarContract.Events.TITLE, stripHtml(event.getName()))
+                    .putExtra(CalendarContract.Events.HAS_ALARM, false)
+                    .putExtra(CalendarContract.Events.DESCRIPTION, event.getCalendarDescription())
+                    .putExtra(CalendarContract.Events.EVENT_TIMEZONE, GcEvent.GCFFM_TIMEZONE);
+            intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.getDatum());
+            intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, event.getEndDatum());
+            intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, false);
+            intent.putExtra(CalendarContract.Events.EVENT_LOCATION, event.getCoords());
+            startActivity(intent);
+        } else if (menuName.equals(getString(R.string.menu_event_share))) {
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Geocaching Event");
+            String shareMessage = "\nHallo, kommst du zu diesem Event?\n\n";
+            DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 
-                return true;
-            default:
-                return super.onContextItemSelected(item);
+            shareMessage = shareMessage + "https://coord.info/" + event.getGeocode()
+                    + "\n\nStart:\n" + dateFormat.format(event.getDatum()) + " Uhr"
+                    + "\n\nKoordinaten:\nhttps://www.google.de/maps/search/" + event.getDecimalCoords() + "/"
+                    + "\n\nOwner:\n" + event.getOwner()
+                    + "\n\nEin Service von https://gcffm.de";
+            shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
+            startActivity(Intent.createChooser(shareIntent, "choose one"));
         }
     }
 

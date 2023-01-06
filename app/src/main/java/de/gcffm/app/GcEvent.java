@@ -18,6 +18,8 @@ class GcEvent {
     private double distanz;
     private String owner;
     private EventType type = EventType.EVENT;
+    private String ort;
+    private String bundesland;
 
     public long getDatum() {
         return datum;
@@ -171,5 +173,21 @@ class GcEvent {
 
     public void setDistanz(double distanz) {
         this.distanz = distanz;
+    }
+
+    public void setOrt(final String ort) {
+        this.ort = ort;
+    }
+
+    public String getOrt() {
+        return ort;
+    }
+
+    public void setBundesland(final String bundesland) {
+        this.bundesland = bundesland;
+    }
+
+    public String getBundesland() {
+        return bundesland;
     }
 }
