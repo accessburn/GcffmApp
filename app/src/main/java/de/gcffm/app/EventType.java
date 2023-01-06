@@ -26,8 +26,8 @@ enum EventType {
         this.filter = filter;
     }
 
-    public static EventType byName(final String name) {
-        for (final EventType type : values()) {
+    public static EventType byName(String name) {
+        for (EventType type : values()) {
             if (type.name().toLowerCase().equals(name)) {
                 return type;
             }

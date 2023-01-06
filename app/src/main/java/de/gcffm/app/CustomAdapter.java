@@ -15,7 +15,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +32,7 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
     private List<GcEvent> events;
     private final Context context;
 
-    public CustomAdapter(final Context context, final int resource, final List<GcEvent> events) {
+    public CustomAdapter(Context context, int resource, List<GcEvent> events) {
         super();
 
         this.context = context;
@@ -48,37 +47,37 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
     }
 
     @Override
-    public GcEvent getItem(final int position) {
+    public GcEvent getItem(int position) {
         return events.get(position);
     }
 
     @Override
-    public long getItemId(final int position) {
+    public long getItemId(int position) {
         return position;
     }
 
     @NonNull
     @Override
-    public View getView(final int position, final View convertView, @NonNull final ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         View view = convertView;
         if (view == null) {
-            final LayoutInflater vi;
+            LayoutInflater vi;
             vi = LayoutInflater.from(context);
             view = vi.inflate(resourceLayout, null);
         }
 
-        final GcEvent p = events.get(position);
+        GcEvent p = events.get(position);
 
         if (p != null) {
-            final TextView date = view.findViewById(R.id.eventDate);
-            final TextView coord = view.findViewById(R.id.eventCoord);
-            final TextView name = view.findViewById(R.id.eventName);
-            final TextView type = view.findViewById(R.id.eventType);
-            final TextView owner = view.findViewById(R.id.eventOwner);
-            final ImageView icon = view.findViewById(R.id.eventIcon);
-            final float alpha = p.isPast() ? 0.5f : 1.0f;
+            TextView date = view.findViewById(R.id.eventDate);
+            TextView coord = view.findViewById(R.id.eventCoord);
+            TextView name = view.findViewById(R.id.eventName);
+            TextView type = view.findViewById(R.id.eventType);
+            TextView owner = view.findViewById(R.id.eventOwner);
+            ImageView icon = view.findViewById(R.id.eventIcon);
+            float alpha = p.isPast() ? 0.5f : 1.0f;
 
-            final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE dd.MM.yy HH:mm");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE dd.MM.yy HH:mm");
             System.out.println("getEndDatum: " + p.getEndDatum());
             date.setText(dateFormat.format(p.getDatumAsCalendar().getTime()));
             date.setAlpha(alpha);
@@ -94,8 +93,7 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
 
             if (p.isToday()) {
 
-                if (p.getType().getDescription() == "news")
-                {
+                if (p.getType() == EventType.NEWS) {
                     view.setBackgroundResource(R.drawable.item_list_backgroundcolor_today_news);
                 } else {
                     view.setBackgroundResource(R.drawable.item_list_backgroundcolor_today);
@@ -127,7 +125,7 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
         return filter;
     }
 
-    public void replace(final List<GcEvent> events) {
+    public void replace(List<GcEvent> events) {
         this.events = events;
         this.allEvents = new ArrayList<>(events);
         notifyDataSetInvalidated();
@@ -139,8 +137,8 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
      */
     private class ArrayFilter extends Filter {
         @Override
-        protected FilterResults performFiltering(final CharSequence search) {
-            final FilterResults results = new FilterResults();
+        protected FilterResults performFiltering(CharSequence search) {
+            FilterResults results = new FilterResults();
 
             if (search == null || search.length() == 0) {
                 synchronized (lock) {
@@ -148,10 +146,10 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
                     results.count = allEvents.size();
                 }
             } else {
-                final String searchString = search.toString().toLowerCase(Locale.getDefault());
-                final List<GcEvent> newValues = new ArrayList<>(allEvents.size());
+                String searchString = search.toString().toLowerCase(Locale.getDefault());
+                List<GcEvent> newValues = new ArrayList<>(allEvents.size());
 
-                for (final GcEvent event : allEvents) {
+                for (GcEvent event : allEvents) {
                     if (event.getName().toLowerCase(Locale.ROOT).contains(searchString)
                             || event.getOwner().toLowerCase(Locale.ROOT).contains(searchString)) {
                         newValues.add(event);
@@ -167,7 +165,7 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
 
         @Override
         @SuppressWarnings("unchecked")
-        protected void publishResults(final CharSequence constraint, final FilterResults results) {
+        protected void publishResults(CharSequence constraint, FilterResults results) {
             events = (List<GcEvent>) results.values;
             if (results.count > 0) {
                 notifyDataSetChanged();

@@ -15,6 +15,7 @@ class GcEvent {
     private long endDatum;
     private double lat;
     private double lon;
+    private double distanz;
     private String owner;
     private EventType type = EventType.EVENT;
 
@@ -22,7 +23,7 @@ class GcEvent {
         return datum;
     }
 
-    public void setDatum(final long datum) {
+    public void setDatum(long datum) {
         this.datum = datum;
     }
 
@@ -30,7 +31,7 @@ class GcEvent {
         return geocode;
     }
 
-    public void setGeocode(final String geocode) {
+    public void setGeocode(String geocode) {
         this.geocode = geocode;
     }
 
@@ -38,11 +39,11 @@ class GcEvent {
         return name;
     }
 
-    public void setName(final String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public void setLat(final double lat) {
+    public void setLat(double lat) {
         this.lat = lat;
     }
 
@@ -50,7 +51,7 @@ class GcEvent {
         return lat;
     }
 
-    public void setLon(final double lon) {
+    public void setLon(double lon) {
         this.lon = lon;
     }
 
@@ -96,7 +97,7 @@ class GcEvent {
         return (int) Math.round(lon * 1e6);
     }
 
-    private static int getDeg(final int degE6) {
+    private static int getDeg(int degE6) {
         return Math.abs(degE6 / 1000000);
     }
 
@@ -108,21 +109,21 @@ class GcEvent {
         return getMinRaw(getLongitudeE6());
     }
 
-    private static double getMinRaw(final int degE6) {
+    private static double getMinRaw(int degE6) {
         return (Math.abs(degE6) * 60L % 60000000L) / 1000000d;
     }
 
     public boolean isToday() {
-        final Calendar today = Calendar.getInstance();
-        final Calendar eventCal = getDatumAsCalendar();
+        Calendar today = Calendar.getInstance();
+        Calendar eventCal = getDatumAsCalendar();
 
         return today.get(Calendar.DAY_OF_YEAR) == eventCal.get(Calendar.DAY_OF_YEAR)
                 && today.get(Calendar.YEAR) == eventCal.get(Calendar.YEAR);
     }
 
     public boolean isPast() {
-        final Calendar today = Calendar.getInstance();
-        final Calendar eventCal = getDatumAsCalendar();
+        Calendar today = Calendar.getInstance();
+        Calendar eventCal = getDatumAsCalendar();
 
         return today.get(Calendar.DAY_OF_YEAR) > eventCal.get(Calendar.DAY_OF_YEAR)
                 && today.get(Calendar.YEAR) >= eventCal.get(Calendar.YEAR);
@@ -130,13 +131,13 @@ class GcEvent {
 
     @NonNull
     public Calendar getDatumAsCalendar() {
-        final Calendar eventCal = Calendar.getInstance();
+        Calendar eventCal = Calendar.getInstance();
         eventCal.setTimeInMillis(datum);
         eventCal.setTimeZone(GCFFM_TIMEZONE);
         return eventCal;
     }
 
-    public void setOwner(final String owner) {
+    public void setOwner(String owner) {
         this.owner = owner;
     }
 
@@ -144,7 +145,7 @@ class GcEvent {
         return owner;
     }
 
-    public void setType(final EventType type) {
+    public void setType(EventType type) {
         this.type = type;
     }
 
@@ -160,7 +161,15 @@ class GcEvent {
         return endDatum;
     }
 
-    public void setEndDatum(final long endDatum) {
+    public void setEndDatum(long endDatum) {
         this.endDatum = endDatum;
+    }
+
+    public double getDistanz() {
+        return distanz;
+    }
+
+    public void setDistanz(double distanz) {
+        this.distanz = distanz;
     }
 }
