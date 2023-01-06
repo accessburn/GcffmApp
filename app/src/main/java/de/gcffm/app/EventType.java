@@ -9,6 +9,7 @@ enum EventType {
     GIGA("Giga-Event", R.drawable.type_giga),
     CITO("CiTo", R.drawable.type_cito),
     MAZE("Maze", R.drawable.type_maze),
+    NEWS("news", R.drawable.type_news),
     COMMUNITYCELEBRATION("Community Celebration", R.drawable.type_event);
 
     private final String description;
