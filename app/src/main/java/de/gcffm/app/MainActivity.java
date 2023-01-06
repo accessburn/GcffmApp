@@ -519,7 +519,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         alertDialog.show();
 
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            PreferencesUtils.setMaxKm(this, binding.sbMaxKm.getProgress());
+            PreferencesUtils.setMaxKm(this, Math.max(binding.sbMaxKm.getProgress(), 1));
             alertDialog.dismiss();
             if (sw.isChecked()) {
                 refreshEvents();
