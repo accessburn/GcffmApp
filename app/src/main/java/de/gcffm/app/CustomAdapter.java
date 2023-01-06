@@ -92,7 +92,13 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
             name.setAlpha(alpha);
 
             if (p.isToday()) {
-                view.setBackgroundResource(R.drawable.item_list_backgroundcolor_today);
+
+                if (p.getType().getDescription() == "news")
+                {
+                    view.setBackgroundResource(R.drawable.item_list_backgroundcolor_today_news);
+                } else {
+                    view.setBackgroundResource(R.drawable.item_list_backgroundcolor_today);
+                }
             } else {
                 if (position % 2 == 1) {
                     view.setBackgroundResource(R.drawable.item_list_backgroundcolor);
@@ -100,7 +106,7 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
                     view.setBackgroundResource(R.drawable.item_list_backgroundcolor2);
                 }
             }
-
+System.out.println(p.getType().getDescription());
             type.setText(p.getType().getDescription());
             type.setAlpha(alpha);
             owner.setText(p.getOwner());
