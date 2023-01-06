@@ -7,5 +7,6 @@
     <color name="listItem1">#ffffff</color>
     <color name="listItem2">#F5F5F5</color>
     <color name="listItemSelected">#FF5B02</color>
+    <color name="listItemNews">#E11E18</color>
 
 </resources>

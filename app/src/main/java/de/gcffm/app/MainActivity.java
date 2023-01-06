@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private String lastSearch;
     private SwitchCompat sw;
     private Location lastKnownLocation;
+    private de.gcffm.app.databinding.MaxKmDialogBinding binding;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -209,16 +210,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         final AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
         final GcEvent event = adapter.getItem(acmi.position);
 
-        if (v.getId() == R.id.listView) {
-            menu.add(Menu.NONE, MENU_CONTEXT_OPEN_ID, Menu.NONE, R.string.menu_event_open);
-            if (!event.isPast()) {
-                menu.add(Menu.NONE, MENU_CONTEXT_NAVIGATE_ID, Menu.NONE, R.string.menu_event_navigate);
-            }
-            menu.add(Menu.NONE, MENU_CONTEXT_COPY_GEOCODE_ID, Menu.NONE, R.string.menu_event_copy_geocode);
-            menu.add(Menu.NONE, MENU_CONTEXT_COPY_COORDS_ID, Menu.NONE, R.string.menu_event_copy_coords);
-            if (!event.isPast()) {
-                menu.add(Menu.NONE, MENU_CONTEXT_CALENDAR_ID, Menu.NONE, R.string.menu_event_add_to_calendar);
-                menu.add(Menu.NONE, MENU_CONTEXT_SHARE_ID, Menu.NONE, R.string.menu_event_share);
+        if (!event.getType().toString().equals("NEWS")) {
+            if (v.getId() == R.id.listView) {
+                menu.add(Menu.NONE, MENU_CONTEXT_OPEN_ID, Menu.NONE, R.string.menu_event_open);
+                if (!event.isPast()) {
+                    menu.add(Menu.NONE, MENU_CONTEXT_NAVIGATE_ID, Menu.NONE, R.string.menu_event_navigate);
+                }
+                menu.add(Menu.NONE, MENU_CONTEXT_COPY_GEOCODE_ID, Menu.NONE, R.string.menu_event_copy_geocode);
+                menu.add(Menu.NONE, MENU_CONTEXT_COPY_COORDS_ID, Menu.NONE, R.string.menu_event_copy_coords);
+                if (!event.isPast()) {
+                    menu.add(Menu.NONE, MENU_CONTEXT_CALENDAR_ID, Menu.NONE, R.string.menu_event_add_to_calendar);
+                    menu.add(Menu.NONE, MENU_CONTEXT_SHARE_ID, Menu.NONE, R.string.menu_event_share);
+                }
             }
         }
     }
@@ -414,7 +417,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 connection.connect();
 
                 final InputStream stream = connection.getInputStream();
-                //final InputStream stream = getResources().openRawResource(R.raw.gcffm); // for local testing
                 reader = new BufferedReader(new InputStreamReader(stream));
                 final StringBuilder buffer = new StringBuilder();
                 String line;
@@ -486,15 +488,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void showMaxKmDialog() {
-        MaxKmDialogBinding binding = MaxKmDialogBinding.inflate(LayoutInflater.from(this));
-        int currentMaxKm = PreferencesUtils.getMaxKm(this);
-        setMaxKmText(binding, currentMaxKm);
-        binding.sbMaxKm.setProgress(currentMaxKm);
+        binding = MaxKmDialogBinding.inflate(LayoutInflater.from(this));
+        binding.sbMaxKm.setProgress(PreferencesUtils.getMaxKm(this));
+        setMaxKmText();
         binding.sbMaxKm.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                int progress = binding.sbMaxKm.getProgress();
-                setMaxKmText(binding, progress);
+                setMaxKmText();
             }
 
             @Override
@@ -519,7 +519,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         alertDialog.show();
 
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            PreferencesUtils.setMaxKm(this, Math.max(binding.sbMaxKm.getProgress(), 1));
+            PreferencesUtils.setMaxKm(this, getSelectedMaxKm());
             alertDialog.dismiss();
             if (sw.isChecked()) {
                 refreshEvents();
@@ -527,23 +527,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    private void setMaxKmText(final MaxKmDialogBinding binding, final int maxKm) {
+    private int getSelectedMaxKm() {
+        return Math.max(binding.sbMaxKm.getProgress(), 1);
+    }
+
+    private void setMaxKmText() {
+        int maxKm = getSelectedMaxKm();
         if (maxKm < MAX_KM_UNLIMITED) {
-            binding.maxKm.setText(getString(R.string.max_km_info, String.valueOf(Math.max(maxKm, 1))));
+            binding.maxKm.setText(getString(R.string.max_km_info, String.valueOf(maxKm)));
         } else {
             binding.maxKm.setText(getString(R.string.max_km_info, getString(R.string.max_km_unlimited)));
         }
     }
 
     private void showEventFilterDialog() {
-        Set<String> eventFilter = PreferencesUtils.getEventFilter(this);
-        EventType[] values = EventType.values();
-        String[] eventNames = new String[values.length];
-        boolean[] selected = new boolean[values.length];
+        Set<String> selectedEventFilter = PreferencesUtils.getEventFilter(this);
+        EventType[] allEventFilter = EventType.allFilterAsArray();
+        String[] eventNames = new String[allEventFilter.length];
+        boolean[] selected = new boolean[allEventFilter.length];
 
-        for (int i = 0; i < values.length; i++) {
-            eventNames[i] = values[i].getDescription();
-            selected[i] = eventFilter.contains(values[i].name());
+        for (int i = 0; i < allEventFilter.length; i++) {
+            eventNames[i] = allEventFilter[i].getDescription();
+            selected[i] = selectedEventFilter.contains(allEventFilter[i].name());
         }
 
         AlertDialog alertDialog = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AlertDialogCustom))
@@ -551,10 +556,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setTitle(R.string.event_filter)
                 .setMultiChoiceItems(eventNames, selected,
                         (dialog, which, isChecked) -> {
-                                String name = values[which].name();
-                                if (isChecked) {
-                                    eventFilter.add(name);
-                                } else eventFilter.remove(name);
+                            String name = allEventFilter[which].name();
+                            if (isChecked) {
+                                selectedEventFilter.add(name);
+                            } else {
+                                selectedEventFilter.remove(name);
+                            }
                         })
                 .setPositiveButton(android.R.string.ok, null)
                 .setNegativeButton(android.R.string.cancel, null)
@@ -562,7 +569,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         alertDialog.show();
 
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            PreferencesUtils.setEventFilter(MainActivity.this, eventFilter);
+            PreferencesUtils.setEventFilter(MainActivity.this, selectedEventFilter);
             alertDialog.dismiss();
             refreshEvents();
         });
