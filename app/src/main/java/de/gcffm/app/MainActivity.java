@@ -417,7 +417,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 connection.connect();
 
                 final InputStream stream = connection.getInputStream();
-                //final InputStream stream = getResources().openRawResource(R.raw.gcffm); // for local testing
                 reader = new BufferedReader(new InputStreamReader(stream));
                 final StringBuilder buffer = new StringBuilder();
                 String line;
