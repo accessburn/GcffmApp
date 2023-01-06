@@ -24,8 +24,11 @@
         "\n\n\n"Source: <b><a href="https://github.com/accessburn/GcffmApp">GitHub</a></b>
         "\n"Lizenz: <b><a href="https://github.com/accessburn/GcffmApp/blob/master/LICENSE.txt">MIT</a></b>
         "\n\n"Diese App wurde entwickelt für <b><a href="https://gcffm.de">gcffm.de</a></b>.
-        "\n\n\n"Info:
+        "\n\n\n"<b>Info:</b>
+        "\n"
+        "\n"- Rote Einträge sind NEWS und meistens wichtig ;-)
         "\n"- Gelb hervorgehobene Events finden heute statt.
+        "\n"
         "\n"- Eventliste wird drei Tage rückwirkend angezeigt.
         "\n"- Event lange gedrückt halten öffnet Menü.
     </string>
