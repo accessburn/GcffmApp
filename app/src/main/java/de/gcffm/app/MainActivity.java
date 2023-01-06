@@ -395,7 +395,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 } else {
                     mainActivity.runOnUiThread(() -> Toast.makeText(mainActivity, R.string.menu_sort_time, Toast.LENGTH_SHORT).show());
-                    urlParameter = "&sort=time";
+                    urlParameter = "&order=time";
                 }
 
                 StringBuilder event = new StringBuilder();
@@ -540,6 +540,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         EventType[] values = EventType.values();
         String[] eventNames = new String[values.length];
         boolean[] selected = new boolean[values.length];
+
         for (int i = 0; i < values.length; i++) {
             eventNames[i] = values[i].getDescription();
             selected[i] = eventFilter.contains(values[i].name());
@@ -550,10 +551,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setTitle(R.string.event_filter)
                 .setMultiChoiceItems(eventNames, selected,
                         (dialog, which, isChecked) -> {
-                            String name = values[which].name();
-                            if (isChecked) {
-                                eventFilter.add(name);
-                            } else eventFilter.remove(name);
+                                String name = values[which].name();
+                                if (isChecked) {
+                                    eventFilter.add(name);
+                                } else eventFilter.remove(name);
                         })
                 .setPositiveButton(android.R.string.ok, null)
                 .setNegativeButton(android.R.string.cancel, null)
