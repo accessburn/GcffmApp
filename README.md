@@ -20,7 +20,8 @@ Lizenz: **[MIT](https://github.com/accessburn/GcffmApp/blob/master/LICENSE.txt)*
 Diese App wurde entwickelt für **[gcffm.de](https://gcffm.de)**.
 
 
-**Info:**
+
+## Info
 
 - Rote Einträge sind NEWS und meistens wichtig. :-)
 - Gelb hervorgehobene Events finden heute statt.
