@@ -21,6 +21,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:id="@+id/eventDistanz"
+        android:layout_toEndOf="@+id/eventDate"
         android:layout_alignParentEnd="true" />
 
     <ImageView
@@ -47,14 +48,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:id="@+id/eventType"
-        android:layout_below="@+id/eventName"
-        android:layout_toEndOf="@+id/eventIcon" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
         android:id="@+id/eventOwner"
         android:layout_below="@+id/eventName"
         android:layout_alignParentEnd="true" />
@@ -64,7 +57,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:id="@+id/eventBundeslandOrt"
-        android:layout_below="@+id/eventType"
+        android:layout_below="@+id/eventName"
         android:layout_toEndOf="@+id/eventIcon" />
 
 </RelativeLayout>
