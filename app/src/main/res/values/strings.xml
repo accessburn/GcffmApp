@@ -19,18 +19,22 @@
     <string name="menu_event_copy_coords">Koordinaten kopieren</string>
     <string name="about">Über</string>
     <string name="menu_other">Other</string>
-    <string name="app_info_text">\n\nApp-Entwicklung: <b><a href="https://github.com/pstorch">Peter Storch</a></b>
-        \n<b>Kann Spuren von Tobias Riefer enthalten.</b>
-        "\n\n\n"Source: <b><a href="https://github.com/accessburn/GcffmApp">GitHub</a></b>
-        "\n"Lizenz: <b><a href="https://github.com/accessburn/GcffmApp/blob/master/LICENSE.txt">MIT</a></b>
-        "\n\n"Diese App wurde entwickelt für <b><a href="https://gcffm.de">gcffm.de</a></b>.
-        "\n\n\n"<b>Info:</b>
+    <string name="app_info_text">\n\n App-Entwicklung:
+        <b><a href="https://github.com/pstorch">Peter Storch</a></b>,
+        <b><a href="https://TRcoding.net">Tobias Riefer</a></b>
+        "\n" OSM-Daten: <b><a href="https://www.geocaching.com/p/?guid=a3791fe5-24d2-491b-aa56-d42656b5a450">M7780</a></b>
+        "\n" Apple-Version: <b><a href="https://github.com/andre0707">Andre</a></b>
+        "\n\n\n" Source: <b><a href="https://github.com/accessburn/GcffmApp">GitHub</a></b>
+        "\n" Lizenz: <b><a href="https://github.com/accessburn/GcffmApp/blob/master/LICENSE.txt">MIT</a></b>
+        "\n\n" Diese App wurde entwickelt für <b><a href="https://gcffm.de">gcffm.de</a></b>.
+        "\n\n\n" <b>Info:</b>
         "\n"
-        "\n"- Rote Einträge sind NEWS und meistens wichtig ;-)
-        "\n"- Gelb hervorgehobene Events finden heute statt.
+        "\n" - Rote Einträge sind NEWS und meistens wichtig. \ud83d\ude03
+        "\n" - Gelb hervorgehobene Events finden heute statt.
+        "\n" - Graue Events liegen in der Vergangenheit (max. 3 Tage).
         "\n"
-        "\n"- Eventliste wird drei Tage rückwirkend angezeigt.
-        "\n"- Event lange gedrückt halten öffnet Menü.
+        "\n" - Event anklicken öffnet Menü.
+        "\n" - Switch oben rechts wechselt die Sortierung (Eventtag/Entfernung).
     </string>
     <string name="logo">Logo</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
