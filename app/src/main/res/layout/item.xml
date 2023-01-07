@@ -21,7 +21,6 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:id="@+id/eventDistanz"
-        android:layout_toEndOf="@+id/eventDate"
         android:layout_alignParentEnd="true" />
 
     <ImageView
