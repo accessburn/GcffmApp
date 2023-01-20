@@ -267,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         AlertDialog alertDialog = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AlertDialogCustom))
                 .setIcon(R.mipmap.ic_launcher)
-                .setTitle(event.getCoords())
+                .setTitle(event.getCoords() + "\n" + event.getGeocode())
                 .setItems(menuEntries,
                         (dialog, which) -> onPopupMenuItemSelected(menuEntries[which], event))
                 .setPositiveButton(android.R.string.ok, null)
