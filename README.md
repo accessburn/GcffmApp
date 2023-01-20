@@ -1,8 +1,9 @@
-    # Geocaching Frankfurt
+# Geocaching Frankfurt
 
 Android-App für https://gcffm.de.
 
 - Google Play: https://play.google.com/store/apps/details?id=de.gcffm.app
+- Apple AppStore: https://apps.apple.com/de/app/gcffm-eventapp/id1449297839
 - Twitter https://twitter.com/gcffm
 - Facebook https://facebook.com/gcffm/
 
@@ -11,7 +12,7 @@ Android-App für https://gcffm.de.
 
 App: **[Peter Storch](https://github.com/pstorch)**, **[Tobias Riefer](https://TRcoding.net)**
 OSM-Daten: **[M7780](https://www.geocaching.com/p/?guid=a3791fe5-24d2-491b-aa56-d42656b5a450)**
-Apple-Version: **[André](https://github.com/andre0707)**
+Apple-Version: **[Andre](https://github.com/andre0707/gcffmEventapp)**
 
 
 Source: **[GitHub](https://github.com/accessburn/GcffmApp)**
