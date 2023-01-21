@@ -339,6 +339,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (exception != null) {
             Toast.makeText(getBaseContext(), getString(R.string.event_update_failed) + exception.getMessage(), Toast.LENGTH_LONG).show();
         } else {
+            if (!PreferencesUtils.getShowOldEvents(this)) {
+                List<GcEvent> oldEvents = new ArrayList<>();
+                for (GcEvent event : events) {
+                    if (event.isPast()) {
+                        oldEvents.add(event);
+                    }
+                }
+                events.removeAll(oldEvents);
+            }
             adapter.replace(events);
             if (!TextUtils.isEmpty(lastSearch)) {
                 searchList(lastSearch);
@@ -402,12 +411,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void showEventFilterDialog() {
         Set<String> selectedEventFilter = PreferencesUtils.getEventFilter(this);
         EventType[] allEventFilter = EventType.allFilterAsArray();
-        String[] eventNames = new String[allEventFilter.length];
-        boolean[] selected = new boolean[allEventFilter.length];
+        String[] eventNames = new String[allEventFilter.length + 1];
+        boolean[] selected = new boolean[allEventFilter.length + 1];
+
+        eventNames[0] = getString(R.string.outdated_events);
+        selected[0] = PreferencesUtils.getShowOldEvents(this);
 
         for (int i = 0; i < allEventFilter.length; i++) {
-            eventNames[i] = allEventFilter[i].getDescription();
-            selected[i] = selectedEventFilter.contains(allEventFilter[i].name());
+            EventType eventTypeFilter = allEventFilter[i];
+            eventNames[i + 1] = eventTypeFilter.getDescription();
+            selected[i + 1] = selectedEventFilter.contains(eventTypeFilter.name());
         }
 
         AlertDialog alertDialog = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AlertDialogCustom))
@@ -415,11 +428,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setTitle(R.string.event_filter)
                 .setMultiChoiceItems(eventNames, selected,
                         (dialog, which, isChecked) -> {
-                            String name = allEventFilter[which].name();
-                            if (isChecked) {
-                                selectedEventFilter.add(name);
+                            if (which == 0) {
+                                PreferencesUtils.setShowOldEvents(this, isChecked);
                             } else {
-                                selectedEventFilter.remove(name);
+                                String name = allEventFilter[which].name();
+                                if (isChecked) {
+                                    selectedEventFilter.add(name);
+                                } else {
+                                    selectedEventFilter.remove(name);
+                                }
                             }
                         })
                 .setPositiveButton(android.R.string.ok, null)

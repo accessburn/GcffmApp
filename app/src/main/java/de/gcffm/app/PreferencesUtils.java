@@ -75,4 +75,13 @@ public class PreferencesUtils {
     public static void setEventFilter(Context context, Set<String> eventFilter) {
         setStringSet(context, R.string.PREF_EVENT_FILTER, eventFilter);
     }
+
+    public static boolean getShowOldEvents(Context context) {
+        return getBoolean(context, R.string.PREF_SHOW_OLD_EVENTS, true);
+    }
+
+    public static void setShowOldEvents(Context context, final boolean showOldEvents) {
+        setBoolean(context, R.string.PREF_SHOW_OLD_EVENTS, showOldEvents);
+    }
+
 }
