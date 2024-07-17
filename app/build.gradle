@@ -6,8 +6,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 34
         compileSdk 34
-        versionCode 11
-        versionName "3.1"
+        versionCode 14
+        versionName "3.1.2"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         buildConfigField "String", "GCFFM_API_URL", GCFFM_API_URL
     }
