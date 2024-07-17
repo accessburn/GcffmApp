@@ -53,12 +53,6 @@ import de.gcffm.app.databinding.MaxKmDialogBinding;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private static final int MENU_CONTEXT_OPEN_ID = 1;
-    private static final int MENU_CONTEXT_NAVIGATE_ID = 2;
-    private static final int MENU_CONTEXT_COPY_GEOCODE_ID = 3;
-    private static final int MENU_CONTEXT_CALENDAR_ID = 4;
-    private static final int MENU_CONTEXT_COPY_COORDS_ID = 5;
-    private static final int MENU_CONTEXT_SHARE_ID = 6;
     public static final int ONE_HOUR = 60 * 60 * 1000;
     public static final String TAG = "MainActivity";
     public static final int MAX_KM_UNLIMITED = 200;
@@ -203,12 +197,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         MenuItem searchMenu = menu.findItem(R.id.action_search);
         searchMenu.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
             @Override
-            public boolean onMenuItemActionExpand(MenuItem arg0) {
+            public boolean onMenuItemActionExpand(@NonNull MenuItem arg0) {
                 return true;
             }
 
             @Override
-            public boolean onMenuItemActionCollapse(MenuItem arg0) {
+            public boolean onMenuItemActionCollapse(@NonNull MenuItem arg0) {
                 invalidateOptionsMenu();
                 return true;
             }
