@@ -431,7 +431,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             if (which == 0) {
                                 PreferencesUtils.setShowOldEvents(this, isChecked);
                             } else {
-                                String name = allEventFilter[which].name();
+                                String name = allEventFilter[which - 1].name();
                                 if (isChecked) {
                                     selectedEventFilter.add(name);
                                 } else {
